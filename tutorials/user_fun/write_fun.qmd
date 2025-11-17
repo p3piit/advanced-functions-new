@@ -1,0 +1,85 @@
+---
+title: "Writing Functions in R"
+---
+
+Functions are one of the most important tools in R. They let you package a sequence of operations into a single reusable command, reducing repetition and making your code easier to read and maintain.
+
+The general structure of a function in R is as follows:
+
+```{r}
+function_name <- function(arg1, arg2 = default_value) {
+  # body: operations using the arguments
+  return(output)
+}
+```
+
+A function definition has three main components:
+
+* *Name:* the label you assign to your new function.
+* *Arguments:* the inputs your function takes; they can have default values.
+* *Body:* the code that executes when the function is called.
+
+The `return()` statement specifies what the function should output, but it is optional. If omitted, R automatically returns the value of the last evaluated expression.
+
+A simple example:
+
+```{r}
+square <- function(x) {
+  x^2
+}
+
+square(4)
+```
+
+This function takes one argument (`x`), squares it, and returns the result. You can store the output or use it directly in a calculation:
+
+```{r}
+square(3) + 2
+```
+
+In R, functions are objects just like numbers, vectors, or data frames. You can print them, assign them, or inspect their content:
+
+```{r}
+square
+```
+
+The main reason to write your own functions is to avoid repeating the same code. If you notice yourself copying and pasting the same few lines several times, that’s a good sign that those lines should become a function instead.
+
+Functions help you to make the code more reusable, using one definition that can be called multiple times, to make the code more readable, using meaningful names to describe what the code does, and to encapsulate complexity, allowing you to hide the details of a process behind a simple interface.
+
+For instance, suppose you frequently rescale numeric variables to a 0–1 range. Instead of repeating the logic each time, you can define a function once and call it whenever needed:
+
+```{r}
+rescale <- function(x, na.rm = TRUE) {
+  rng <- range(x, na.rm = na.rm)
+  (x - rng[1]) / (rng[2] - rng[1])
+}
+rescale(c(1, 5, 10))
+```
+
+This function now performs a well-defined transformation in a single, descriptive call.
+
+::: practice
+
+## Practice
+
+Write a function that takes a temperature in Fahrenheit as input and returns the equivalent temperature in Celsius. The formula to convert Fahrenheit to Celsius is: C = (F - 32) * 5/9
+
+:::: {.panel-tabset}
+## {{< var tab_title.editor >}}
+
+```{webr-r}
+
+```
+
+
+## {{< var tab_title.solution >}}
+
+```{r}
+fahrenheit_to_celsius <- function(f) {
+  (f - 32) * 5 / 9
+}
+```
+::::
+
+:::

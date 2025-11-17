@@ -1,0 +1,32 @@
+Question
+========
+What is missing in the following R code so that the loop returns these values?
+
+```{r, eval=FALSE}
+for (i in 1:10) {
+  __________________
+  a <- i^2 
+  print(a)
+}
+```
+
+```{r, echo=FALSE}
+for (i in 1:10) {
+  if (i == 5) next
+  a <- i^2 
+  print(a)
+}
+```
+
+
+Solution
+========
+To skip the iteration when `i` is equal to 5, you need to add a conditional statement that checks for this condition and uses the `next` function to skip to the next iteration of the loop. The missing line is: `if (i == 5) next`.
+
+
+
+Meta-information
+================
+exname: next
+extype: str
+exsolution: if (i == 5) next

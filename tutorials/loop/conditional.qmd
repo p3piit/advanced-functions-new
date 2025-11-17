@@ -1,0 +1,89 @@
+---
+title: "Conditional Loops"
+---
+
+Not all loops in R have a fixed number of repetitions. Sometimes you want your code to keep running until a certain condition is met. In these cases, you can use conditional loops, which rely on logical tests rather than predefined sequences. R provides two main forms of conditional looping: the `while` loop and the `repeat` loop.
+
+A `while` loop checks a condition before each iteration and keeps running as long as that condition is TRUE. For example, the following loop prints numbers from 1 to 5:
+
+```{r}
+x <- 1
+while (x <= 5) {
+  print(x)
+  x <- x + 1
+}
+
+```
+
+Here, the variable `x` starts at 1. Before every iteration, R checks whether `x <= 5`. If the condition is true, the code inside the braces runs. Once the condition becomes false, the loop stops automatically.
+
+A `repeat` loop, on the other hand, does not check a condition at the start—it runs indefinitely until you explicitly tell it to stop using `break()`.
+
+```{r}
+x <- 1
+repeat {
+  print(x)
+  x <- x + 1
+  if (x > 5) break
+}
+```
+
+This produces the same output as the previous example. The `repeat` loop is useful when the stopping condition depends on a computation that happens inside the loop, rather than something known in advance.
+
+You can also control the flow inside loops using two special commands: `break` and `next`. `break`, as we saw, immediately stops the loop, even if the condition is still true, while `next` skips the rest of the current iteration and moves on to the next one.
+
+Here’s a simple demonstration:
+
+```{r}
+for (i in 1:5) {
+  if (i == 3) next     # skip 3
+  if (i == 5) break    # stop before printing 5
+  print(i)
+}
+
+```
+
+This prints 1, 2, and 4 — it skips 3 because of `next`, and stops entirely before reaching 5 because of `break`.
+
+Conditional loops and flow control give you flexibility: you can make loops respond to data dynamically, handle exceptions, or stop automatically when a specific goal is reached.
+
+::: practice
+
+## Practice
+
+Write a conditional loop that print all the possible combination between the numbers 1 to 10 in where the first number is bigger than the second number
+
+:::: {.panel-tabset}
+## {{< var tab_title.editor >}}
+
+```{webr-r}
+
+```
+
+
+## {{< var tab_title.solution >}}
+
+```{r}
+i <- 1
+while(i <= 10){
+  j <- 1
+  while(j <= 10){
+    if(i < j) break
+    print(paste(i, j))
+    j <- j + 1
+  }
+  i <- i + 1
+}
+
+```
+::::
+
+:::
+
+
+
+
+
+
+
+

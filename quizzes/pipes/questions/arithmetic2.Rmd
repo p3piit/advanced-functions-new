@@ -1,0 +1,18 @@
+
+
+Question
+========
+Using `%>%`, write (in one line) how you would compute the squared variance of the column `bmi` inside `health`, assuming `bmi` exists.
+
+
+Solution
+========
+
+The correct code is `health$bmi %>% var() %>% sqrt()`.
+
+Meta-information
+================
+exname: Arithmetic
+extype: str
+exsolution: `health %>% pull(bmi) %>% var()`
+extol: 0.01

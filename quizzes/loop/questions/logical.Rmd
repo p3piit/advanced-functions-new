@@ -1,0 +1,42 @@
+Question
+========
+Which correctly uses `break` to exit a loop once `i` equals 3?
+
+Answerlist
+----------
+
+* `for (i in 1:5) { if (i == 3) break; print(i) }`
+* `for (i in 1:5) { break(i == 3); print(i) }`
+* `for (i == 3 in 1:5) break`
+* `for (i in 1:5) break print(i)`
+* `for (i in 1:5) if i == 3 break else print(i)`
+* `i <- 1; break(for (i in 1:5))`
+* `for (i in 1:5) { print(i) break(i==3) }`
+* `for (i in 1:3) print(i); break`
+* `break for i in 1:5`
+* `for (i in 1:5) print(i==3)`
+
+
+Solution
+========
+
+Answerlist
+----------
+* TRUE
+* FALSE: Incorrect use of break as a function.
+* FALSE: Incorrect syntax for loop variable assignment.
+* FALSE: Wrong syntax for break statement.
+* FALSE: Missing curly braces for if-else statement.
+* FALSE: Incorrect use of break outside of loop.
+* FALSE: Incorrect use of break as a function.
+* FALSE: Break statement is outside the loop.
+* FALSE: Incorrect syntax for break statement.
+* FALSE: Does not exit loop; just prints logical comparison.
+
+
+Meta-information
+================
+exname: Logical Comparisons
+extype: schoice
+exsolution: 1000000000
+exshuffle: 5

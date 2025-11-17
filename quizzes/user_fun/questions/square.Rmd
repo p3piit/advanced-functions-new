@@ -1,0 +1,44 @@
+Question
+========
+
+Which function correctly squares each element of a vector `v`?
+
+Answerlist
+----------
+
+* `square <- function(v) v^2`
+* `square(v) <- function() v^2`
+* `square <- function(v) for (i in v) i^2`
+* `square <- function(v) return(v)^2`
+* `square <- function(v) mean(v^2)`
+* `square <- function(x) x * v`
+* `square <- function() v^2`
+* `square <- function(v) { for(i in v) print(i^2) }`
+* `square <- function(v) c(v, v)`
+* `square <- for (i in v) i^2`
+
+
+
+Solution
+========
+
+Answerlist
+----------
+* TRUE: This function correctly squares each element of vector `v`.
+* FALSE: The argument assignment is incorrect; it should be `function(v)`.
+* FALSE: This function does not return a vector; it only iterates through elements without storing results.
+* FALSE: The `return` statement is misused; it should return the squared vector directly.
+* FALSE: This function returns the mean of squared elements, not the squared vector.
+* FALSE: The function uses an undefined variable `v` instead of the argument `x`.
+* FALSE: The function lacks an argument to accept the vector `v`.
+* FALSE: This function prints squared values but does not return a vector of squared elements.
+* FALSE: This function concatenates the vector with itself instead of squaring its elements.
+* FALSE: It is not a function
+
+
+Meta-information
+================
+exname: Logical Comparisons
+extype: schoice
+exsolution: 1000000000
+exshuffle: 5

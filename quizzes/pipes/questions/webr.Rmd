@@ -1,0 +1,59 @@
+Question
+========
+
+```{webr-r}
+#| autorun: true
+#| context: setup
+library(psychTools)
+data("bfi", package = "psychTools")
+library(dplyr) # load dplyr package
+library(psych) # load psych package
+names(bfi.keys) <- c("agree", "consc", "extra", "neuro", "open")
+tmp <- scoreItems(keys = bfi.keys, items = bfi, impute = "none")
+bfi <- data.frame(bfi, as.data.frame(tmp$scores)) %>%
+     mutate(
+        gender = factor(gender, labels = c("male", "female")),
+        agree_z = (agree - mean(agree, na.rm = TRUE)) / sd(agree, na.rm = TRUE),
+        consc_z = (consc - mean(consc, na.rm = TRUE)) / sd(consc, na.rm = TRUE),
+        extra_z = (extra - mean(extra, na.rm = TRUE)) / sd(extra, na.rm = TRUE),
+        neuro_z = (neuro - mean(neuro, na.rm = TRUE)) / sd(neuro, na.rm = TRUE),
+        open_z  = (open  - mean(open,  na.rm = TRUE)) / sd(open,  na.rm = TRUE),
+        gm = case_when(
+                  age < 18 & gender == "male"   ~ "boy",
+                  age < 18 & gender == "female" ~ "girl",
+                  age >= 18 & gender == "male"  ~ "man",
+                  age >= 18 & gender == "female"~ "woman",
+                  TRUE ~ NA_character_),
+        gm = as.factor(gm),
+        ) %>%
+        rename(ed = education,
+               gen = gender) %>%
+        rename_with(.fn = tolower, .cols = matches("\\d$"))
+```
+
+Using a pipeline, calculate the mean of the `agree` variable for participants who are older than 30 years. Use the WebR to write your code and insert the result in the box, rounding to two decimal places.
+
+```{webr-r}
+
+```
+
+Round your answer to two decimal places.
+
+Solution
+========
+The correct pipeline code to calculate the mean of the `agree` variable for participants older than 30 years is:
+
+`bfi %>%`
+`filter(age>30) %>%`
+`select(agree) %>%`
+`unlist() %>%`
+`mean()`
+
+After rounding, we get 4.84.
+
+Meta-information
+================
+exname: WebR
+extype: num
+exsolution: 4.84
+extol: 0.01

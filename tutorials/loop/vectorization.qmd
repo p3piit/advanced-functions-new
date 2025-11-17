@@ -1,0 +1,86 @@
+---
+title: "Loops and Vectorization"
+---
+
+Loops are a flexible and intuitive way to express repetition, but in R they are not always the most efficient choice. The language is built around vectorized operations, which perform many computations in parallel under the hood. Instead of iterating over each element one at a time, R’s vectorized functions apply the same operation to entire vectors or matrices at once, using optimized internal code written in C.
+
+Vectorized code is usually both faster and clearer, because it avoids explicit looping and intermediate assignments. It also makes your code more expressive — the operation you want to perform is stated directly, rather than described step by step.
+
+For example, compare these two approaches:
+
+```{r}
+x <- 1:5
+
+# Using a loop
+out <- numeric(length(x))
+for (i in seq_along(x)) {
+  out[i] <- x[i]^2
+}
+out
+
+# Vectorized version
+x^2
+
+```
+
+Both produce the same result, but the vectorized expression `x^2` is shorter, easier to read, and runs more efficiently.
+
+Vectorization becomes even more powerful when working with data frames or matrices. Suppose we want to compute the mean of each column in a data frame:
+
+```{r}
+df <- data.frame(a = 1:5, b = 6:10, c = 11:15)
+
+# Loop version
+means <- numeric(ncol(df))
+for (i in seq_along(df)) {
+  means[i] <- mean(df[[i]])
+}
+means
+
+# Vectorized version using apply()
+apply(df, 2, mean)
+```
+
+The `apply()` function internally handles the iteration over columns, making the code concise and efficient.
+
+In general, vectorized functions like `apply()`, `rowMeans()`, `sum()`, `mean()`, or arithmetic operators are implemented in optimized C code. They avoid the overhead of R-level looping, which can be significant when working with large datasets.
+
+That said, loops remain valuable when each iteration depends on the result of the previous one or when operations cannot be expressed as simple element-wise transformations. The key is to use loops when you need flexibility, and vectorized functions when you need speed and clarity.
+
+::: practice
+
+## Practice
+
+Vectorize the following loop that computes a quadratic transformation on a vector `x`:
+
+```{r}
+x <- 1:10
+out <- numeric(length(x))
+
+for (i in seq_along(x)) {
+  out[i] <- x[i]^2 + 3 * x[i] + 1
+}
+
+out
+
+```
+
+
+:::: {.panel-tabset}
+## {{< var tab_title.editor >}}
+
+```{webr-r}
+
+```
+
+
+## {{< var tab_title.solution >}}
+
+```{r}
+
+x <- 1:10
+out <- x^2 + 3 * x + 1
+out
+
+```
+

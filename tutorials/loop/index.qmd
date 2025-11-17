@@ -1,0 +1,9 @@
+---
+title: "Loops"
+---
+
+Many analyses require doing the same kind of operation again and again: apply a transformation to each column, compute a summary for each group, or keep sampling until a condition is met. Loops let you express this repetition once and have R carry it out automatically.
+
+R offers different kinds of loops depending on how repetition is controlled. A `for` loop runs a fixed number of times, stepping through each element of a sequence or each column in a data frame. In contrast, conditional loops like `while` and `repeat` don’t have a predetermined number of iterations — they keep running until a logical condition is no longer satisfied. This makes them useful when the stopping point depends on the data or the outcome of previous steps.
+
+Although loops are essential for expressing repetition, R also provides vectorized operations, which perform the same kind of element-wise work internally, but in a single, optimized command. Vectorization is important because it makes your code both faster and cleaner, reducing the need for explicit loops in many cases.

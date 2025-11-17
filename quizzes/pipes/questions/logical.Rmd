@@ -1,0 +1,47 @@
+Question
+========
+
+What is the key difference between a `for` loop and a `while` loop?
+
+Answerlist
+----------
+
+* A `for` loop repeats a fixed number of times; a `while` loop repeats until a condition becomes false.
+* A `for` loop is slower than a `while` loop.
+* A `for` loop can only iterate over numeric vectors.
+* A `while` loop cannot contain conditional statements.
+* A `while` loop must always run at least once.
+* A `for` loop cannot modify objects outside the loop.
+* A `for` loop checks its condition at the end of the loop.
+* A `while` loop cannot iterate over data frame columns.
+* A `for` loop cannot be nested inside another loop.
+* Both loops behave the same; the difference is only stylistic.
+
+
+Solution
+========
+
+Answerlist
+----------
+* TRUE
+* FALSE: 
+
+* TRUE: 14 is strictly less than 48
+* TRUE: 7 is equal to 7, and 7 is greater than or equal to 7
+* TRUE: "alice" is not equal to "bob", but "alice is equal to "alice"
+* TRUE: 6 is not strictly greater than 7, and that result is negated
+* TRUE: Trivially
+* FALSE: Trivially
+* FALSE: "foo" is not equal to "bar"
+* FALSE: 7 is equal to 7, but 7 is not strictly greater than 7
+* FALSE: "alice" is not equal to "bob", and "alice" is equal to "alice"
+* FALSE: "alice" is not equal to "bob"
+* FALSE: Trivial negation
+* FALSE: Trivially
+
+Meta-information
+================
+exname: Logical Comparisons
+extype: mchoice
+exsolution: 1111110000000
+exshuffle: 6

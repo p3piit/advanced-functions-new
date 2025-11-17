@@ -1,5 +1,5 @@
 ---
-title: "Module Template"
+title: "Advanced Functions in R"
 page-navigation: false
 format:
   html: 
@@ -10,33 +10,40 @@ format:
 source(here::here("R", "buttons.R"))
 ```
 
-Welcome to our template module. Every module comprises a series of topical *tutorials*, such as the three linked below.
+Welcome to the module on Advanced Functions in R. This module introduces the core programming tools that make R a truly flexible and powerful language. You’ll learn how to automate repetitive tasks, design your own reusable functions, and connect multiple operations together into clear, efficient workflows. Each tutorial section will conclude with a short knowledge quiz.
 
-1. [First Topic](/tutorials/first_tutorial/index.qmd)
-1. [Second Topic](/tutorials/second_tutorial/index.qmd)
+1. [Pipes](/tutorials/pipes/index.qmd)
+2. [Loops](/tutorials/loop/index.qmd)
+3. [User-Defined Functions](/tutorials/user-fun/index.qmd)
 
-Each tutorial will comprise a series of interactive lessons with practice problems embedded throughout. Each tutorial
-section should be wrapped up with a knowledge quiz.
+Each tutorial will comprise a series of interactive lessons with practice problems embedded throughout. Each tutorial section will conclude with a short knowledge quiz.
 
 ## Learning Goals
 
 After completing this module, you will be able to:
 
-### Tutorial 1
+### Pipes
 
-1. A thing you should learn from Tutorial 1.
-1. Another thing you should learn from Tutorial 1.
-1. One more thing you should learn From Tutorial 1.
+1. Understand how the `%>%` and `|>` pipe operators work.
+2. Build readable, multi-step pipelines that chain together data transformations.
+3. Use placeholders and the exposition pipe `%$%` for more flexible function composition.
 
-### Tutorial 2
+### Loops
 
-1. A thing you should learn from Tutorial 2.
-1. Another thing you should learn from Tutorial 2.
+1. Use `for` loops to iterate across elements of vectors or data frames.
+2. Write conditional loops (`while` and `repeat`) and control flow with `break` and `next`.
+3. Recognize when vectorized operations are a more efficient alternative to looping.
+
+### User-defined Functions
+
+1. Write your own functions to automate repetitive tasks and simplify code.
+2. Use arguments and default values effectively.
+3. Apply conditional logic and return values to control function output.
 
 Click the button below to get started with the first tutorial.
 
 ```{r}
 #| echo: false
 #| results: asis
-begin_button("/tutorials/first_tutorial/index.html")
+begin_button("/tutorials/pipes/index.html")
 ```

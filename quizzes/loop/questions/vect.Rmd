@@ -1,0 +1,41 @@
+Question
+========
+
+Which of the following is a vectorized operation in R?
+
+Answerlist
+----------
+
+* `y <- x + 1`
+* `lapply(x, function(i) i + 1)`
+* `x * y * z` inside a loop
+* `apply(x, 1, sum)`
+* `y <- paste(x)`
+* `y <- c()`
+* `x <- runif`
+* `for (i in 1:length(x)) y[i] <- x[i] + 1`
+* `repeat { y <- x + 1 }`
+* `if (x + 1) y`
+
+Solution
+========
+
+Answerlist
+----------
+* TRUE: This is a vectorized operation; R adds 1 to each element of `x` simultaneously.
+* TRUE: `lapply` applies the function to each element of `x`, which is a form of vectorization.
+* TRUE: Multiplying vectors element-wise is a vectorized operation, evwn if it's inside a loop.
+* TRUE: `apply` applies the `sum` function across rows of `x`, which is vectorized.
+* TRUE: `paste` is vectorized and can operate on each element of `x`.
+* FALSE: This simply initializes an empty vector, not a vectorized operation.
+* FALSE: This assigns the function `runif` to `x`, not a vectorized operation.
+* FALSE: This is a `for` loop, not vectorized.
+* FALSE: This is an infinite `repeat` loop, not vectorized.
+* FALSE: The `if` statement is not vectorized; it expects a single logical value.
+
+Meta-information
+================
+exname: Vectorized Operations 
+extype: mchoice
+exsolution: 1111100000
+exshuffle: 5

@@ -1,0 +1,106 @@
+---
+title: "The `for` loop"
+---
+
+Loops let you automate repetitive tasks by running the same block of code several times. Each cycle of repetition is called an iteration, and the variable that changes with each cycle is the loop variable.
+
+The most common loop in R is the `for` loop, which runs some pre-defined operations for each element in a given sequence. In a `for` loop, you define a variable that will take each value of the sequence in turn, and a block of code that tells R what to do with that value. The loop automatically continues until it reaches the end of the sequence and then stops.
+
+For instance, if you tell R to loop over the numbers from 1 to 5, it will first take 1, run the code you’ve specified, then move to 2, then 3, and so on, until all values have been processed.
+
+```{r}
+for (i in 1:5) {
+  print(i)
+}
+```
+
+In this case, `i` takes the values 1 through 5 in turn, and each value is printed before the loop moves to the next. When the sequence ends, the loop stops automatically.
+
+You can also use loops to perform calculations on vectors. For example:
+
+```{r}
+x <- c(2, 4, 6, 8)
+for (val in x) {
+  print(val^2)
+}
+
+```
+
+Here, `val` represents each element of `x`, and the loop prints its square.
+
+If you want to store the results rather than print them, you can define a container and fill it step by step:
+
+```{r}
+results <- numeric(5)
+for (i in 1:5) {
+  results[i] <- i^2
+}
+results
+```
+
+Predefine an object—like `numeric(5)` in this example—is a good habit, because it tells R in advance how much space it will need, which makes loops run faster, and will also gives as an immediate error if something doesn't as expected.
+
+Loops can also iterate over the columns of a data frame, allowing you to perform the same operation on several variables:
+
+```{r}
+df <- data.frame(a = 1:3, b = 4:6, c = 7:9)
+for (col in names(df)) {
+  print(mean(df[[col]]))
+}
+```
+
+Here, the loop goes through each column name in `df`, extracts the corresponding data, and prints its mean. This pattern is particularly useful when you need to apply the same kind of calculation across multiple variables without writing separate commands for each.
+
+Loops can also be nested, meaning one loop runs inside another. This is useful when you need to repeat an operation across multiple dimensions — for example, computing a value for every combination of two variables or processing a table row by row and column by column. In a nested loop, the inner loop completes all its iterations for each single step of the outer loop.
+
+Here’s a simple example that prints all possible pairs of values between 1 and 3:
+
+```{r}
+for (i in 1:3) {
+  for (j in 1:3) {
+    cat("i =", i, ", j =", j, "\n")
+  }
+}
+```
+
+The outer loop runs for each value of `i`, and for each of those, the inner loop runs through all values of `j`. The result is a complete grid of combinations between the two numbers.
+
+::: practice
+
+## Practice
+
+Write a for loop that print all the possible combination between the numbers 1 to 5 and if the sum of the two numbers is even or odd.
+
+:::: {.panel-tabset}
+## {{< var tab_title.editor >}}
+
+```{webr-r}
+
+```
+
+
+## {{< var tab_title.hint >}}
+
+In R the function `%%` gives the remainder of a division. 
+
+## {{< var tab_title.solution >}}
+
+```{r}
+
+for (i in 1:4) {
+  for (j in 1:4) {
+    sum_ij <- i + j
+    if (sum_ij %% 2 == 0) {
+      parity <- "even"
+    } else {
+      parity <- "odd"
+    }
+    cat("i =", i, ", j =", j, "sum is", parity, "\n")
+  }
+}
+
+```
+::::
+
+:::
+

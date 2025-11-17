@@ -1,0 +1,8 @@
+---
+title: "User defined Functions"
+---
+
+In R, functions are the fundamental building blocks of the language. Every command you call—whether it’s `mean()`, `summary()`, or `mutate()`—is a function. Learning to define your own functions allows you to capture repeated operations, reduce code duplication, and give structure to your analyses.
+
+When your analysis grows, you will often find yourself performing the same calculation or transformation on different datasets or variables. Instead of rewriting the same code each time, you can wrap that logic inside a function. This not only makes your code shorter and clearer, but also easier to debug, reuse, and share.
+

@@ -1,0 +1,21 @@
+Question
+========
+
+This function is supposed to return the cube of `x`, but there is something wrong with it. Fix the body of the function so that it correctly returns the cube of `x`.
+
+```{r}
+cube <- function(x) {
+  print(x^3)
+}
+```
+
+
+Solution
+========
+The issue with the function is that it uses `print()` instead of `return()`. To fix it, we should replace `print(x^3)` with `return(x^3)`.
+
+Meta-information
+================
+exname: Arithmetic
+extype: str
+exsolution: return(x^3)

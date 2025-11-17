@@ -1,0 +1,39 @@
+Question
+========
+ Which command correctly uses pipes to compute the mean of the variable `age` in `bfi`?
+
+Answerlist
+----------
+
+* `bfi$age %>% mean()`
+* `bfi %$% mean(age)`
+* `bfi$age |> mean()`
+* `bfi %>% .$age %>% mean()`
+* `bfi %>% mean(age)`
+* `mean(bfi$age) %>% ()`
+* `bfi |> mean(age)`
+* `bfi %>% mean()$age`
+* `bfi %>% mean(age, .)`
+* `mean() %>% bfi$age`
+
+Solution
+========
+
+Answerlist
+----------
+* TRUE: This command correctly uses the pipe operator `%>%` to pass `bfi$age` to the `mean()` function.
+* TRUE: This command correctly uses the magrittr pipe operator `%$%` to expose the columns of `bfi` and then computes the mean of `age`.
+* TRUE: This command correctly uses the base R pipe operator `|>` to pass `bfi$age` to the `mean()` function.
+* TRUE: This command correctly uses the pipe operator `%>%` to extract `age` from `bfi` and then computes the mean.
+* FALSE: This command incorrectly attempts to compute the mean of `age` directly on the `bfi` data frame without extracting the `age` variable first.
+* FALSE: This command incorrectly attempts to pipe the result of `mean(bfi$age)` into an empty function call `()`.
+* FALSE: This command incorrectly attempts to compute the mean of `age` directly on the `bfi` data frame using the base R pipe operator `|>`.
+* FALSE: This command incorrectly attempts to access `age` from the result of `mean()` called on `bfi`.
+* FALSE: This command incorrectly attempts to compute the mean of `age` by passing `age` as an argument to `mean()` without extracting it from `bfi`.
+* FALSE: This command incorrectly attempts to pipe the result of `mean()` into `bfi$age`.
+Meta-information
+================
+exname: mean
+extype: mchoice
+exsolution: 1111000000
+exshuffle: 5

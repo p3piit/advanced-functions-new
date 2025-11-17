@@ -1,0 +1,42 @@
+Question
+========
+
+Which function definition includes a default argument?
+
+Answerlist
+----------
+
+* `f <- function(x) x + y`
+* `f <- function(x = 3) { x^2 }`
+* `f <- function(x, y) { x*y }`
+* `f <- function() { x }`
+* `f <- function(x + 1) { x }`
+* `f <- function(default = ) { x }`
+* `f <- function(x <- 3) x`
+* `f <- function(x:3) x+1`
+* `f <- function(x -> 3) { x^2 }`
+* `f <- function(NA) return()`
+
+Solution
+========
+
+Answerlist
+----------
+* FALSE: The `x` argument has no default value.
+*  TRUE: The `x` argument has a default value of `3`.
+* FALSE: Neither `x` nor `y` have default values.
+* FALSE: The function has no arguments.
+* FALSE: This is not a valid function definition.
+* FALSE: This is not a valid function definition.
+* FALSE: This is not a valid function definition.
+* FALSE: This is not a valid function definition.
+* FALSE: This is not a valid function definition.
+* FALSE: This is not a valid function definition.
+
+
+Meta-information
+================
+exname: Logical Comparisons
+extype: schoice
+exsolution: 1000000000
+exshuffle: 5

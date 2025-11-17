@@ -1,0 +1,173 @@
+---
+title: "Using Pipes for Data Manipulation in R"
+---
+
+```{r, echo=FALSE}
+data("bfi", package = "psychTools")
+library(dplyr) # load dplyr package
+library(psych) # load psych package
+names(bfi.keys) <- c("agree", "consc", "extra", "neuro", "open")
+tmp <- scoreItems(keys = bfi.keys, items = bfi, impute = "none")
+bfi <- data.frame(bfi, as.data.frame(tmp$scores)) %>%
+     mutate(
+        gender = factor(gender, labels = c("male", "female")),
+        agree_z = (agree - mean(agree, na.rm = TRUE)) / sd(agree, na.rm = TRUE),
+        consc_z = (consc - mean(consc, na.rm = TRUE)) / sd(consc, na.rm = TRUE),
+        extra_z = (extra - mean(extra, na.rm = TRUE)) / sd(extra, na.rm = TRUE),
+        neuro_z = (neuro - mean(neuro, na.rm = TRUE)) / sd(neuro, na.rm = TRUE),
+        open_z  = (open  - mean(open,  na.rm = TRUE)) / sd(open,  na.rm = TRUE),
+        gm = case_when(
+                  age < 18 & gender == "male"   ~ "boy",
+                  age < 18 & gender == "female" ~ "girl",
+                  age >= 18 & gender == "male"  ~ "man",
+                  age >= 18 & gender == "female"~ "woman",
+                  TRUE ~ NA_character_),
+        gm = as.factor(gm),
+        ) %>%
+        rename(ed = education,
+               gen = gender) %>%
+        rename_with(.fn = tolower, .cols = matches("\\d$"))
+```
+
+
+### Building a Workflow with Pipes
+
+Pipes are especially powerful when used to chain together multiple data processing steps. Let’s look at a more substantial example.
+
+Suppose we want to:
+
+1. Center the variable `age` on 18.
+2. Create scale scores for `extraversion` and `neuroticism`.
+3. Keep only participants aged 18 or older.
+4. Select only the scale scores and demographic variables.
+5. Sort the data by `extraversion` in ascending order.
+
+Using `dplyr` pipes, we can write:
+
+```{r}
+tmp1 <- bfi %>%
+  mutate(age = age - 18,
+         extra = rowMeans(across(matches("^e\\d$")), na.rm = TRUE),
+         neuro = rowMeans(across(matches("^n\\d$")), na.rm = TRUE)) %>%
+  filter(age >= 0) %>%
+  select(extra, neuro, age, gen, ed, gm) %>%
+  arrange(extra)
+
+head(tmp1, 20)
+```
+
+Each step is explicit, readable, and self-contained — it’s immediately clear what happens and in what order.
+
+The same logic written in base R would be much harder to follow:
+
+```{r}
+tmp2 <- bfi
+tmp2$age   <- tmp2$age - 18
+tmp2$extra <- rowMeans(tmp2[grep("^e\\d$", colnames(tmp2))], na.rm = TRUE)
+tmp2$neuro <- rowMeans(tmp2[grep("^n\\d$", colnames(tmp2))], na.rm = TRUE)
+tmp2 <- tmp2[tmp2$age >= 0, c("extra", "neuro", "age", "gen", "ed", "gm")]
+tmp2 <- tmp2[order(tmp2$extra), ]
+```
+
+Both approaches produce the same result — but the piped version is far clearer.
+
+### How Pipes Work
+
+The pipe operator simply takes the result from the left-hand side and inserts it as the first argument in the function on the right-hand side.
+
+This means the two lines below are equivalent:
+
+```{r}
+mean(bfi$age)
+bfi$age %>% mean()
+```
+
+The same applies here:
+
+```{r}
+var(bfi$a1, na.rm = TRUE)
+bfi$a1 %>% var(na.rm = TRUE)
+```
+
+### What happens when the data isn’t the first argument?
+
+Some functions — like `lm()` — don’t take the data frame as the first argument. If you try to use a pipe directly, it won’t work:
+
+```{r, error=TRUE}
+bfi %>% lm(extra ~ age)  # Error
+```
+
+
+In these cases, you can use the special placeholder `.` to tell R explicitly where to insert the piped object:
+
+```{r}
+bfi %>% lm(extra ~ age, data = .)
+```
+
+This small trick makes it possible to use pipes with nearly any function, even when the data aren’t the first argument.
+
+```{webr-r}
+#| autorun: true
+#| context: setup
+library(psychTools)
+data("bfi", package = "psychTools")
+library(dplyr) # load dplyr package
+library(psych) # load psych package
+names(bfi.keys) <- c("agree", "consc", "extra", "neuro", "open")
+tmp <- scoreItems(keys = bfi.keys, items = bfi, impute = "none")
+bfi <- data.frame(bfi, as.data.frame(tmp$scores)) %>%
+     mutate(
+        gender = factor(gender, labels = c("male", "female")),
+        agree_z = (agree - mean(agree, na.rm = TRUE)) / sd(agree, na.rm = TRUE),
+        consc_z = (consc - mean(consc, na.rm = TRUE)) / sd(consc, na.rm = TRUE),
+        extra_z = (extra - mean(extra, na.rm = TRUE)) / sd(extra, na.rm = TRUE),
+        neuro_z = (neuro - mean(neuro, na.rm = TRUE)) / sd(neuro, na.rm = TRUE),
+        open_z  = (open  - mean(open,  na.rm = TRUE)) / sd(open,  na.rm = TRUE),
+        gm = case_when(
+                  age < 18 & gender == "male"   ~ "boy",
+                  age < 18 & gender == "female" ~ "girl",
+                  age >= 18 & gender == "male"  ~ "man",
+                  age >= 18 & gender == "female"~ "woman",
+                  TRUE ~ NA_character_),
+        gm = as.factor(gm),
+        ) %>%
+        rename(ed = education,
+               gen = gender) %>%
+        rename_with(.fn = tolower, .cols = matches("\\d$"))
+```
+
+
+::: practice
+
+## Practice
+
+Use pipes to perform the following data manipulations on the `bfi` dataset:
+
+1. Create a new variable `age_centered` that centers `age` around its mean.
+2. Filter the dataset to include only participants with `age` greater than 25.
+3. Select only the new centered age variable, the scores for agreeableness and conscientiousness, and the demographic variables `gen` and `ed`.
+4. Display the first 20 rows of the resulting dataset.
+
+
+:::: {.panel-tabset}
+## {{< var tab_title.editor >}}
+
+```{webr-r}
+
+```
+
+
+## {{< var tab_title.solution >}}
+
+```{r}
+bfi %>%
+  mutate(age_centered = age - mean(age, na.rm = TRUE)) %>%
+  filter(age > 25) %>%
+  select(age_centered, agree, consc, gen, ed) %>%
+  head(20)
+```
+::::
+
+:::
+
+

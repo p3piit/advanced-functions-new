@@ -1,0 +1,8 @@
+---
+title: "Pipes"
+---
+
+When data workflows grow beyond one or two steps, code quickly becomes hard to read: nested parentheses pile up, temporary objects proliferate, and the sequence of operations gets obscured. Pipes solve this by letting you write transformations in the order you think about them—left to right, top to bottom—so each result flows naturally into the next step.
+
+The pipe operator, written as `%>%`, is provided by the `magrittr` package . It works by taking the output of one expression and feeding it as the first argument to the next function. This simple idea makes your code easier to read, debug, and modify, especially for multi-step analyses.
+

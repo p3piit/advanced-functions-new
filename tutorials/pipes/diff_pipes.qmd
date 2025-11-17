@@ -1,0 +1,126 @@
+---
+title: "Different Pipe Operators in R"
+---
+
+```{r, echo=FALSE}
+data("bfi", package = "psychTools")
+library(magrittr) # load magrittr package
+library(dplyr) # load dplyr package
+library(psych) # load psych package
+names(bfi.keys) <- c("agree", "consc", "extra", "neuro", "open")
+tmp <- scoreItems(keys = bfi.keys, items = bfi, impute = "none")
+bfi <- data.frame(bfi, as.data.frame(tmp$scores)) %>%
+     mutate(
+        gender = factor(gender, labels = c("male", "female")),
+        agree_z = (agree - mean(agree, na.rm = TRUE)) / sd(agree, na.rm = TRUE),
+        consc_z = (consc - mean(consc, na.rm = TRUE)) / sd(consc, na.rm = TRUE),
+        extra_z = (extra - mean(extra, na.rm = TRUE)) / sd(extra, na.rm = TRUE),
+        neuro_z = (neuro - mean(neuro, na.rm = TRUE)) / sd(neuro, na.rm = TRUE),
+        open_z  = (open  - mean(open,  na.rm = TRUE)) / sd(open,  na.rm = TRUE),
+        gm = case_when(
+                  age < 18 & gender == "male"   ~ "boy",
+                  age < 18 & gender == "female" ~ "girl",
+                  age >= 18 & gender == "male"  ~ "man",
+                  age >= 18 & gender == "female"~ "woman",
+                  TRUE ~ NA_character_),
+        gm = as.factor(gm),
+        ) %>%
+        rename(ed = education,
+               gen = gender) %>%
+        rename_with(.fn = tolower, .cols = matches("\\d$"))
+```
+
+
+### The Exposition Pipe `%$%`
+
+The exposition pipe (`%$%`), also from the `magrittr` package, behaves slightly differently. Instead of passing a dataset as an argument, it exposes the variable names of a data frame directly to the next function.
+
+For example, we can write:
+
+```{r}
+bfi %$% lm(extra ~ age)
+```
+
+This works because `%$%` allows the variables extra and age to be used as if they were objects in the global environment, even though they come from within `bfi`. In practice this means that what we just did is equivalent to:
+
+```{r}
+lm(bfi$extra ~ bfi$age)
+```
+
+
+### The Base R Pipe `|>`
+
+As of R 4.1, there’s also a native pipe operator: `|>`.
+It works like `%>%` but is simpler and doesn’t require loading `dplyr` or `magrittr`.
+
+You can re-create the first example using only base R syntax:
+
+```{r}
+bfi[c("agree", "consc", "extra", "neuro", "open")] |>
+  cov(use = "pairwise") |>
+  diag() |>
+  sqrt()
+```
+
+The base pipe is great for lightweight pipelines, while the `%>%` pipe remains preferred for more complex workflows, especially those using tidyverse functions like `mutate()`, `filter()`, and `select()`.
+
+
+```{webr-r}
+#| autorun: true
+#| context: setup
+library(psychTools)
+data("bfi", package = "psychTools")
+library(dplyr) # load dplyr package
+library(psych) # load psych package
+names(bfi.keys) <- c("agree", "consc", "extra", "neuro", "open")
+tmp <- scoreItems(keys = bfi.keys, items = bfi, impute = "none")
+bfi <- data.frame(bfi, as.data.frame(tmp$scores)) %>%
+     mutate(
+        gender = factor(gender, labels = c("male", "female")),
+        agree_z = (agree - mean(agree, na.rm = TRUE)) / sd(agree, na.rm = TRUE),
+        consc_z = (consc - mean(consc, na.rm = TRUE)) / sd(consc, na.rm = TRUE),
+        extra_z = (extra - mean(extra, na.rm = TRUE)) / sd(extra, na.rm = TRUE),
+        neuro_z = (neuro - mean(neuro, na.rm = TRUE)) / sd(neuro, na.rm = TRUE),
+        open_z  = (open  - mean(open,  na.rm = TRUE)) / sd(open,  na.rm = TRUE),
+        gm = case_when(
+                  age < 18 & gender == "male"   ~ "boy",
+                  age < 18 & gender == "female" ~ "girl",
+                  age >= 18 & gender == "male"  ~ "man",
+                  age >= 18 & gender == "female"~ "woman",
+                  TRUE ~ NA_character_),
+        gm = as.factor(gm),
+        ) %>%
+        rename(ed = education,
+               gen = gender) %>%
+        rename_with(.fn = tolower, .cols = matches("\\d$"))
+```
+
+
+::: practice
+
+## Practice
+
+Use the pipe and exposition pipe to calculate the correlation between `age` and `agree` for adults in the `bfi` data.
+
+:::: {.panel-tabset}
+## {{< var tab_title.editor >}}
+
+```{webr-r}
+
+```
+
+## {{< var tab_title.hint >}}
+
+You can use the `cor()` function to compute the correlation between two variables.
+
+## {{< var tab_title.solution >}}
+
+```{r}
+bfi %>%
+  filter(age >= 18) %$%
+  cor(age, agree)
+```
+::::
+
+:::
+

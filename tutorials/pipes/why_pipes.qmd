@@ -1,0 +1,148 @@
+---
+title: "Why Use Pipes in R?"
+---
+
+```{r, echo=F}
+data("bfi", package = "psychTools")
+library(dplyr) # load dplyr package
+library(psych) # load psych package
+names(bfi.keys) <- c("agree", "consc", "extra", "neuro", "open")
+tmp <- scoreItems(keys = bfi.keys, items = bfi, impute = "none")
+bfi <- data.frame(bfi, as.data.frame(tmp$scores)) %>%
+     mutate(
+        gender = factor(gender, labels = c("male", "female")),
+        agree_z = (agree - mean(agree, na.rm = TRUE)) / sd(agree, na.rm = TRUE),
+        consc_z = (consc - mean(consc, na.rm = TRUE)) / sd(consc, na.rm = TRUE),
+        extra_z = (extra - mean(extra, na.rm = TRUE)) / sd(extra, na.rm = TRUE),
+        neuro_z = (neuro - mean(neuro, na.rm = TRUE)) / sd(neuro, na.rm = TRUE),
+        open_z  = (open  - mean(open,  na.rm = TRUE)) / sd(open,  na.rm = TRUE),
+        gm = case_when(
+                  age < 18 & gender == "male"   ~ "boy",
+                  age < 18 & gender == "female" ~ "girl",
+                  age >= 18 & gender == "male"  ~ "man",
+                  age >= 18 & gender == "female"~ "woman",
+                  TRUE ~ NA_character_),
+        gm = as.factor(gm),
+        ) %>%
+        rename(ed = education,
+               gen = gender) %>%
+        rename_with(.fn = tolower, .cols = matches("\\d$"))
+```
+
+
+When you perform several transformations in R, your code can quickly become cluttered with nested parentheses or a series of temporary variables. Pipes offer a cleaner, more intuitive alternative: they let you write code that mirrors the logical flow of your analysis. Each step passes its output directly into the next, creating a readable sequence of operations that tells the story of your data transformation from start to finish.
+
+First of all, let's call the the `dplyr` package to use the pipe operator `%>%` and look at the dataset we will work with:
+
+```{r}
+library(dplyr)
+head(bfi)
+```
+
+
+For example, consider this chain of operations applied to the `bfi` dataset:
+
+1. Select five personality scale scores.
+2. Compute their covariance matrix.
+3. Extract the variances from this matrix.
+4. Take the square roots to obtain standard deviations.
+
+In base R, this can be written as nested function calls:
+
+```{r}
+sqrt(
+  diag(
+    cov(
+      bfi[c("agree", "consc", "extra", "neuro", "open")],
+      use = "pairwise"
+    )
+  )
+)
+```
+
+While technically correct, the structure is hard to follow. Alternatively, we can save intermediate results:
+
+```{r}
+tmp <- bfi[c("agree", "consc", "extra", "neuro", "open")]
+tmp <- cov(tmp, use = "pairwise")
+tmp <- diag(tmp)
+sqrt(tmp)
+```
+
+This approach is clearer but involves multiple temporary variables and assignments.
+
+Using a pipe, we can express the same sequence in a single, logical flow that reads from top to bottom:
+
+```{r}
+bfi %>%
+  select(agree, consc, extra, neuro, open) %>%
+  cov(use = "pairwise") %>%
+  diag() %>%
+  sqrt()
+```
+
+Here, the result of each function is passed directly into the next, eliminating unnecessary assignments and parentheses. Pipes enhance readability by allowing you to see the sequence of transformations at a glance, making your code easier to understand and maintain.
+
+```{webr-r}
+#| autorun: true
+#| context: setup
+library(psychTools)
+data("bfi", package = "psychTools")
+library(dplyr) # load dplyr package
+library(psych) # load psych package
+names(bfi.keys) <- c("agree", "consc", "extra", "neuro", "open")
+tmp <- scoreItems(keys = bfi.keys, items = bfi, impute = "none")
+bfi <- data.frame(bfi, as.data.frame(tmp$scores)) %>%
+     mutate(
+        gender = factor(gender, labels = c("male", "female")),
+        agree_z = (agree - mean(agree, na.rm = TRUE)) / sd(agree, na.rm = TRUE),
+        consc_z = (consc - mean(consc, na.rm = TRUE)) / sd(consc, na.rm = TRUE),
+        extra_z = (extra - mean(extra, na.rm = TRUE)) / sd(extra, na.rm = TRUE),
+        neuro_z = (neuro - mean(neuro, na.rm = TRUE)) / sd(neuro, na.rm = TRUE),
+        open_z  = (open  - mean(open,  na.rm = TRUE)) / sd(open,  na.rm = TRUE),
+        gm = case_when(
+                  age < 18 & gender == "male"   ~ "boy",
+                  age < 18 & gender == "female" ~ "girl",
+                  age >= 18 & gender == "male"  ~ "man",
+                  age >= 18 & gender == "female"~ "woman",
+                  TRUE ~ NA_character_),
+        gm = as.factor(gm),
+        ) %>%
+        rename(ed = education,
+               gen = gender) %>%
+        rename_with(.fn = tolower, .cols = matches("\\d$"))
+```
+
+
+::: practice
+
+## Practice
+
+Use a pipeline to calculate the square root of the mean of the agreeableness scale score for males in the `bfi` data.
+
+:::: {.panel-tabset}
+## {{< var tab_title.editor >}}
+
+```{webr-r}
+
+```
+
+## {{< var tab_title.hint >}}
+
+You can use the `unlist()` function to covert a list to a vector.
+
+## {{< var tab_title.solution >}}
+
+```{r}
+bfi %>%
+  filter(gen == "male") %>%
+  select(agree) %>%
+  unlist() %>%
+  mean(na.rm = TRUE) %>%
+  sqrt()
+
+```
+::::
+
+:::
+

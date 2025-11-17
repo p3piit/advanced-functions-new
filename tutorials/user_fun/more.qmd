@@ -1,0 +1,157 @@
+---
+title: "More on User Defined Functions"
+---
+
+### Multiple Arguments and Default Values
+
+Functions in R can take multiple arguments, and some of these can have default values. This means that a function can work with just the essential inputs, while still allowing flexibility when you want to adjust its behavior.
+
+```{r}
+power <- function(x, exp = 2) {
+  x ^ exp
+}
+
+power(3)
+
+power(3, 3)
+```
+
+In this example, if you don’t specify `exp`, it defaults to 2, so the function squares its input by default.
+
+You can also include conditional statements such as `if` inside a function, allowing it to behave differently depending on the input.
+
+```{r}
+categorize_age <- function(age) {
+  if (age < 18) {
+    "minor"
+  } else {
+    "adult"
+  }
+}
+
+categorize_age(17)
+```
+
+This simple example shows how a function can make logical decisions. Conditional logic is especially useful when your function needs to classify, filter, or adjust its behavior dynamically based on its inputs.
+
+A function can return any kind of R object — not just a single value. It can output a vector, a list, a data frame, or even a plot. For example:
+```{r}
+summarize_vector <- function(vec) {
+  mean_val <- mean(vec, na.rm = TRUE)
+  sd_val <- sd(vec, na.rm = TRUE)
+  n <- sum(!is.na(vec))
+  
+  return(list(mean = mean_val, sd = sd_val, n = n))
+}
+
+
+summarize_vector(c(1, 2, 3, 4, NA))
+```
+
+Here, the function returns a list containing the mean, standard deviation, and number of non-missing values from the input vector.
+
+When you define a function, R automatically creates a new environment for it to run in. Any variables created inside the function exist only within that environment — they are not available outside the function once it finishes running.
+
+```{r, error=TRUE}
+add_one <- function(x) {
+  y <- x + 1
+  return(y)
+}
+
+add_one(4)
+
+y
+```
+
+In this example, `y` exists only while the function is being executed. Once the function finishes, the temporary variable disappears. This isolation prevents functions from accidentally modifying your global workspace.
+
+Functions can still access variables defined outside them (in the global environment), but they won’t modify those variables unless you explicitly return a value and reassign it.
+
+```{r}
+
+x <- 10
+increment <- function() {
+  x + 1
+}
+increment()
+
+x
+```
+
+This separation between the function’s internal environment and the global workspace is a fundamental principle of R. It ensures that functions are self-contained, predictable, and safe to reuse without causing unwanted side effects.
+
+## Anonymous Functions and Shortcuts
+
+Sometimes, you might need a simple one-off function to perform a quick operation — for example, as part of another function call. In these cases, defining a named function can feel unnecessary. These short, temporary functions are known as anonymous functions.
+
+You can define them inline using the regular `function()` syntax:
+
+```{r}
+sapply(1:5, function(x) x^2)
+```
+
+Anonymous functions are especially useful inside tidyverse pipelines when you need to apply a transformation directly within a data workflow:
+
+```{r}
+library(dplyr)
+data <- data.frame(age = c(20, 25, 30, 35, 40),
+                   weight = c(150, 160, 170, 180, 190),
+                   height = c(65, 66, 67, 68, 69))
+data|> mutate(age_sq = sapply(age, function(x) x^2))
+```
+
+They let you write small, focused operations inline — keeping your code concise without cluttering your workspace with extra function names.
+
+::: practice
+
+## Practice
+
+a. Write a function called that takes a single numeric argument and returns a character string describing whether the number is `"positive"`, `"negative"`, or `"zero"`. 
+
+b. Add a second argument to your function that allows the user to specify whether they want the output in uppercase or lowercase letters. The default should be lowercase.
+
+:::: {.panel-tabset}
+## {{< var tab_title.editor >}}
+
+```{webr-r}
+
+```
+
+## {{< var tab_title.hint >}}
+
+To go from lowercase to uppercase, you can use the `toupper()` function in R.
+
+## {{< var tab_title.solution >}}
+
+```{r}
+# a 
+describe_number <- function(num) {
+  if (num > 0) {
+    return("positive")
+  } else if (num < 0) {
+    return("negative")
+  } else {
+    return("zero")
+  }
+}
+
+# b
+describe_number <- function(num, to_upper = FALSE) {
+  if (num > 0) {
+    result <- "positive"
+  } else if (num < 0) {
+    result <- "negative"
+  } else {
+    result <- "zero"
+  }
+  if (to_upper) {
+    result <- toupper(result)
+  }
+  return(result)
+}
+```
+::::
+
+:::
+
+

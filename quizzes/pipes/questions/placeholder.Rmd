@@ -1,0 +1,40 @@
+Question
+========
+Which use of the placeholder `.` is valid when the data are not the first argument?
+
+Answerlist
+----------
+
+* `bfi %>% lm(extra ~ age, .)`
+* `bfi %>% lm(extra ~ age, data = .)`
+
+* `bfi %>% lm(extra ~ age)`
+* `bfi %>% .(extra ~ age)`
+* `lm(data = bfi, extra ~ age) %>% .`
+* `lm(extra ~ age, data = .) %>% bfi`
+* `bfi %>% lm(., extra ~ age)`
+* `bfi |> lm(extra ~ age, data = .)`
+* `bfi |> data = . |> lm(extra ~ age)`
+
+Solution
+========
+
+Answerlist
+----------
+* TRUE: This use of the placeholder is the correct syntax for passing the data argument in a pipe.
+* TRUE: This use of the placeholder is the correct for passing the data argument in a pipe.
+* FALSE: The placeholder is not used; the data argument is missing.
+* FALSE: The placeholder is incorrectly used as a function.
+* FALSE: The placeholder is incorrectly used after the function call.
+* FALSE: The placeholder is incorrectly used after the pipe operator.
+* FALSE: The placeholder is incorrectly used as the first argument.
+* FALSE: This use of the placeholder is the correct syntax for passing the data argument in a pipe, but it will not work with the base R pipe operator.
+* FALSE: The syntax is incorrect; the placeholder cannot be used in this way.
+
+
+Meta-information
+================
+exname: Placeholder
+extype: schoice
+exsolution: 110000000
+exshuffle: 5

@@ -1,0 +1,527 @@
+[
+  {
+    "objectID": "tutorials/user_fun/more.html",
+    "href": "tutorials/user_fun/more.html",
+    "title": "More on User Defined Functions",
+    "section": "",
+    "text": "Functions in R can take multiple arguments, and some of these can have default values. This means that a function can work with just the essential inputs, while still allowing flexibility when you want to adjust its behavior.\n\npower &lt;- function(x, exp = 2) {\n  x ^ exp\n}\n\npower(3)\n\n[1] 9\n\npower(3, 3)\n\n[1] 27\n\n\nIn this example, if you don’t specify exp, it defaults to 2, so the function squares its input by default.\nYou can also include conditional statements such as if inside a function, allowing it to behave differently depending on the input.\n\ncategorize_age &lt;- function(age) {\n  if (age &lt; 18) {\n    \"minor\"\n  } else {\n    \"adult\"\n  }\n}\n\ncategorize_age(17)\n\n[1] \"minor\"\n\n\nThis simple example shows how a function can make logical decisions. Conditional logic is especially useful when your function needs to classify, filter, or adjust its behavior dynamically based on its inputs.\nA function can return any kind of R object — not just a single value. It can output a vector, a list, a data frame, or even a plot. For example:\n\nsummarize_vector &lt;- function(vec) {\n  mean_val &lt;- mean(vec, na.rm = TRUE)\n  sd_val &lt;- sd(vec, na.rm = TRUE)\n  n &lt;- sum(!is.na(vec))\n  \n  return(list(mean = mean_val, sd = sd_val, n = n))\n}\n\n\nsummarize_vector(c(1, 2, 3, 4, NA))\n\n$mean\n[1] 2.5\n\n$sd\n[1] 1.290994\n\n$n\n[1] 4\n\n\nHere, the function returns a list containing the mean, standard deviation, and number of non-missing values from the input vector.\nWhen you define a function, R automatically creates a new environment for it to run in. Any variables created inside the function exist only within that environment — they are not available outside the function once it finishes running.\n\nadd_one &lt;- function(x) {\n  y &lt;- x + 1\n  return(y)\n}\n\nadd_one(4)\n\n[1] 5\n\ny\n\nError: object 'y' not found\n\n\nIn this example, y exists only while the function is being executed. Once the function finishes, the temporary variable disappears. This isolation prevents functions from accidentally modifying your global workspace.\nFunctions can still access variables defined outside them (in the global environment), but they won’t modify those variables unless you explicitly return a value and reassign it.\n\nx &lt;- 10\nincrement &lt;- function() {\n  x + 1\n}\nincrement()\n\n[1] 11\n\nx\n\n[1] 10\n\n\nThis separation between the function’s internal environment and the global workspace is a fundamental principle of R. It ensures that functions are self-contained, predictable, and safe to reuse without causing unwanted side effects.",
+    "crumbs": [
+      "Open-Stat-Prog",
+      "User Defined Functions",
+      "More on User Defined Functions"
+    ]
+  },
+  {
+    "objectID": "tutorials/user_fun/more.html#anonymous-functions-and-shortcuts",
+    "href": "tutorials/user_fun/more.html#anonymous-functions-and-shortcuts",
+    "title": "More on User Defined Functions",
+    "section": "Anonymous Functions and Shortcuts",
+    "text": "Anonymous Functions and Shortcuts\nSometimes, you might need a simple one-off function to perform a quick operation — for example, as part of another function call. In these cases, defining a named function can feel unnecessary. These short, temporary functions are known as anonymous functions.\nYou can define them inline using the regular function() syntax:\n\nsapply(1:5, function(x) x^2)\n\n[1]  1  4  9 16 25\n\n\nAnonymous functions are especially useful inside tidyverse pipelines when you need to apply a transformation directly within a data workflow:\n\nlibrary(dplyr)\ndata &lt;- data.frame(age = c(20, 25, 30, 35, 40),\n                   weight = c(150, 160, 170, 180, 190),\n                   height = c(65, 66, 67, 68, 69))\ndata|&gt; mutate(age_sq = sapply(age, function(x) x^2))\n\n  age weight height age_sq\n1  20    150     65    400\n2  25    160     66    625\n3  30    170     67    900\n4  35    180     68   1225\n5  40    190     69   1600\n\n\nThey let you write small, focused operations inline — keeping your code concise without cluttering your workspace with extra function names.\n\n\n\n\n\n\nPractice\n\n\n\n\nWrite a function called that takes a single numeric argument and returns a character string describing whether the number is \"positive\", \"negative\", or \"zero\".\nAdd a second argument to your function that allows the user to specify whether they want the output in uppercase or lowercase letters. The default should be lowercase.\n\n\n Interactive Editor Hint Solution\n\n\n\nPlease enable JavaScript to experience the dynamic code cell content on this page.\n\n\nTo go from lowercase to uppercase, you can use the toupper() function in R.\n\n\n\n# a \ndescribe_number &lt;- function(num) {\n  if (num &gt; 0) {\n    return(\"positive\")\n  } else if (num &lt; 0) {\n    return(\"negative\")\n  } else {\n    return(\"zero\")\n  }\n}\n\n# b\ndescribe_number &lt;- function(num, to_upper = FALSE) {\n  if (num &gt; 0) {\n    result &lt;- \"positive\"\n  } else if (num &lt; 0) {\n    result &lt;- \"negative\"\n  } else {\n    result &lt;- \"zero\"\n  }\n  if (to_upper) {\n    result &lt;- toupper(result)\n  }\n  return(result)\n}",
+    "crumbs": [
+      "Open-Stat-Prog",
+      "User Defined Functions",
+      "More on User Defined Functions"
+    ]
+  },
+  {
+    "objectID": "tutorials/loop/index.html",
+    "href": "tutorials/loop/index.html",
+    "title": "Loops",
+    "section": "",
+    "text": "Many analyses require doing the same kind of operation again and again: apply a transformation to each column, compute a summary for each group, or keep sampling until a condition is met. Loops let you express this repetition once and have R carry it out automatically.\nR offers different kinds of loops depending on how repetition is controlled. A for loop runs a fixed number of times, stepping through each element of a sequence or each column in a data frame. In contrast, conditional loops like while and repeat don’t have a predetermined number of iterations — they keep running until a logical condition is no longer satisfied. This makes them useful when the stopping point depends on the data or the outcome of previous steps.\nAlthough loops are essential for expressing repetition, R also provides vectorized operations, which perform the same kind of element-wise work internally, but in a single, optimized command. Vectorization is important because it makes your code both faster and cleaner, reducing the need for explicit loops in many cases.\n\n\n\n Back to top",
+    "crumbs": [
+      "Open-Stat-Prog",
+      "Loops"
+    ]
+  },
+  {
+    "objectID": "tutorials/loop/for.html",
+    "href": "tutorials/loop/for.html",
+    "title": "The for loop",
+    "section": "",
+    "text": "Loops let you automate repetitive tasks by running the same block of code several times. Each cycle of repetition is called an iteration, and the variable that changes with each cycle is the loop variable.\nThe most common loop in R is the for loop, which runs some pre-defined operations for each element in a given sequence. In a for loop, you define a variable that will take each value of the sequence in turn, and a block of code that tells R what to do with that value. The loop automatically continues until it reaches the end of the sequence and then stops.\nFor instance, if you tell R to loop over the numbers from 1 to 5, it will first take 1, run the code you’ve specified, then move to 2, then 3, and so on, until all values have been processed.\n\nfor (i in 1:5) {\n  print(i)\n}\n\n[1] 1\n[1] 2\n[1] 3\n[1] 4\n[1] 5\n\n\nIn this case, i takes the values 1 through 5 in turn, and each value is printed before the loop moves to the next. When the sequence ends, the loop stops automatically.\nYou can also use loops to perform calculations on vectors. For example:\n\nx &lt;- c(2, 4, 6, 8)\nfor (val in x) {\n  print(val^2)\n}\n\n[1] 4\n[1] 16\n[1] 36\n[1] 64\n\n\nHere, val represents each element of x, and the loop prints its square.\nIf you want to store the results rather than print them, you can define a container and fill it step by step:\n\nresults &lt;- numeric(5)\nfor (i in 1:5) {\n  results[i] &lt;- i^2\n}\nresults\n\n[1]  1  4  9 16 25\n\n\nPredefine an object—like numeric(5) in this example—is a good habit, because it tells R in advance how much space it will need, which makes loops run faster, and will also gives as an immediate error if something doesn’t as expected.\nLoops can also iterate over the columns of a data frame, allowing you to perform the same operation on several variables:\n\ndf &lt;- data.frame(a = 1:3, b = 4:6, c = 7:9)\nfor (col in names(df)) {\n  print(mean(df[[col]]))\n}\n\n[1] 2\n[1] 5\n[1] 8\n\n\nHere, the loop goes through each column name in df, extracts the corresponding data, and prints its mean. This pattern is particularly useful when you need to apply the same kind of calculation across multiple variables without writing separate commands for each.\nLoops can also be nested, meaning one loop runs inside another. This is useful when you need to repeat an operation across multiple dimensions — for example, computing a value for every combination of two variables or processing a table row by row and column by column. In a nested loop, the inner loop completes all its iterations for each single step of the outer loop.\nHere’s a simple example that prints all possible pairs of values between 1 and 3:\n\nfor (i in 1:3) {\n  for (j in 1:3) {\n    cat(\"i =\", i, \", j =\", j, \"\\n\")\n  }\n}\n\ni = 1 , j = 1 \ni = 1 , j = 2 \ni = 1 , j = 3 \ni = 2 , j = 1 \ni = 2 , j = 2 \ni = 2 , j = 3 \ni = 3 , j = 1 \ni = 3 , j = 2 \ni = 3 , j = 3 \n\n\nThe outer loop runs for each value of i, and for each of those, the inner loop runs through all values of j. The result is a complete grid of combinations between the two numbers.\n\n\n\n\n\n\nPractice\n\n\n\nWrite a for loop that print all the possible combination between the numbers 1 to 5 and if the sum of the two numbers is even or odd.\n\n Interactive Editor Hint Solution\n\n\n\nPlease enable JavaScript to experience the dynamic code cell content on this page.\n\n\nIn R the function %% gives the remainder of a division.\n\n\n\nfor (i in 1:4) {\n  for (j in 1:4) {\n    sum_ij &lt;- i + j\n    if (sum_ij %% 2 == 0) {\n      parity &lt;- \"even\"\n    } else {\n      parity &lt;- \"odd\"\n    }\n    cat(\"i =\", i, \", j =\", j, \"sum is\", parity, \"\\n\")\n  }\n}\n\ni = 1 , j = 1 sum is even \ni = 1 , j = 2 sum is odd \ni = 1 , j = 3 sum is even \ni = 1 , j = 4 sum is odd \ni = 2 , j = 1 sum is odd \ni = 2 , j = 2 sum is even \ni = 2 , j = 3 sum is odd \ni = 2 , j = 4 sum is even \ni = 3 , j = 1 sum is even \ni = 3 , j = 2 sum is odd \ni = 3 , j = 3 sum is even \ni = 3 , j = 4 sum is odd \ni = 4 , j = 1 sum is odd \ni = 4 , j = 2 sum is even \ni = 4 , j = 3 sum is odd \ni = 4 , j = 4 sum is even \n\n\n\n\n\n\n\n\n\n\n Back to top",
+    "crumbs": [
+      "Open-Stat-Prog",
+      "Loops",
+      "The `for` loop"
+    ]
+  },
+  {
+    "objectID": "tutorials/pipes/why_pipes.html",
+    "href": "tutorials/pipes/why_pipes.html",
+    "title": "Why Use Pipes in R?",
+    "section": "",
+    "text": "When you perform several transformations in R, your code can quickly become cluttered with nested parentheses or a series of temporary variables. Pipes offer a cleaner, more intuitive alternative: they let you write code that mirrors the logical flow of your analysis. Each step passes its output directly into the next, creating a readable sequence of operations that tells the story of your data transformation from start to finish.\nFirst of all, let’s call the the dplyr package to use the pipe operator %&gt;% and look at the dataset we will work with:\n\nlibrary(dplyr)\nhead(bfi)\n\n      a1 a2 a3 a4 a5 c1 c2 c3 c4 c5 e1 e2 e3 e4 e5 n1 n2 n3 n4 n5 o1 o2 o3 o4\n61617  2  4  3  4  4  2  3  3  4  4  3  3  3  4  4  3  4  2  2  3  3  6  3  4\n61618  2  4  5  2  5  5  4  4  3  4  1  1  6  4  3  3  3  3  5  5  4  2  4  3\n61620  5  4  5  4  4  4  5  4  2  5  2  4  4  4  5  4  5  4  2  3  4  2  5  5\n61621  4  4  6  5  5  4  4  3  5  5  5  3  4  4  4  2  5  2  4  1  3  3  4  3\n61622  2  3  3  4  5  4  4  5  3  2  2  2  5  4  5  2  3  4  4  3  3  3  4  3\n61623  6  6  5  6  5  6  6  6  1  3  2  1  6  5  6  3  5  2  2  3  4  3  5  6\n      o5    gen ed age agree consc extra neuro open     agree_z    consc_z\n61617  3   male NA  16   4.0   2.8   3.8   2.8  3.0 -0.72583913 -1.5406915\n61618  3 female NA  18   4.2   4.0   5.0   3.8  4.0 -0.50322161 -0.2793220\n61620  2 female NA  17   3.8   4.0   4.2   3.6  4.8 -0.94845665 -0.2793220\n61621  5 female NA  17   4.6   3.0   3.6   2.8  3.2 -0.05798656 -1.3304633\n61622  3   male NA  17   4.0   4.4   4.8   3.2  3.6 -0.72583913  0.1411345\n61623  1 female  3  21   4.6   5.6   5.6   3.0  5.0 -0.05798656  1.4025040\n          extra_z     neuro_z     open_z    gm\n61617 -0.32527289 -0.30281564 -1.9627661   boy\n61618  0.80583785  0.53307316 -0.7257147 woman\n61620  0.05176403  0.36589540  0.2639264  girl\n61621 -0.51379134 -0.30281564 -1.7153558  girl\n61622  0.61731939  0.03153988 -1.2205352   boy\n61623  1.37139322 -0.13563788  0.5113367 woman\n\n\nFor example, consider this chain of operations applied to the bfi dataset:\n\nSelect five personality scale scores.\nCompute their covariance matrix.\nExtract the variances from this matrix.\nTake the square roots to obtain standard deviations.\n\nIn base R, this can be written as nested function calls:\n\nsqrt(\n  diag(\n    cov(\n      bfi[c(\"agree\", \"consc\", \"extra\", \"neuro\", \"open\")],\n      use = \"pairwise\"\n    )\n  )\n)\n\n    agree     consc     extra     neuro      open \n0.8984019 0.9513469 1.0609041 1.1963314 0.8083739 \n\n\nWhile technically correct, the structure is hard to follow. Alternatively, we can save intermediate results:\n\ntmp &lt;- bfi[c(\"agree\", \"consc\", \"extra\", \"neuro\", \"open\")]\ntmp &lt;- cov(tmp, use = \"pairwise\")\ntmp &lt;- diag(tmp)\nsqrt(tmp)\n\n    agree     consc     extra     neuro      open \n0.8984019 0.9513469 1.0609041 1.1963314 0.8083739 \n\n\nThis approach is clearer but involves multiple temporary variables and assignments.\nUsing a pipe, we can express the same sequence in a single, logical flow that reads from top to bottom:\n\nbfi %&gt;%\n  select(agree, consc, extra, neuro, open) %&gt;%\n  cov(use = \"pairwise\") %&gt;%\n  diag() %&gt;%\n  sqrt()\n\n    agree     consc     extra     neuro      open \n0.8984019 0.9513469 1.0609041 1.1963314 0.8083739 \n\n\nHere, the result of each function is passed directly into the next, eliminating unnecessary assignments and parentheses. Pipes enhance readability by allowing you to see the sequence of transformations at a glance, making your code easier to understand and maintain.\n\nPlease enable JavaScript to experience the dynamic code cell content on this page.\n\n\n\n\n\n\nPractice\n\n\n\nUse a pipeline to calculate the square root of the mean of the agreeableness scale score for males in the bfi data.\n\n Interactive Editor Hint Solution\n\n\n\nPlease enable JavaScript to experience the dynamic code cell content on this page.\n\n\nYou can use the unlist() function to covert a list to a vector.\n\n\n\nbfi %&gt;%\n  filter(gen == \"male\") %&gt;%\n  select(agree) %&gt;%\n  unlist() %&gt;%\n  mean(na.rm = TRUE) %&gt;%\n  sqrt()\n\n[1] 2.094169\n\n\n\n\n\n\n\n\n\n\n Back to top",
+    "crumbs": [
+      "Open-Stat-Prog",
+      "Pipes",
+      "Why Use Pipes in R?"
+    ]
+  },
+  {
+    "objectID": "tutorials/pipes/data_man.html",
+    "href": "tutorials/pipes/data_man.html",
+    "title": "Using Pipes for Data Manipulation in R",
+    "section": "",
+    "text": "Building a Workflow with Pipes\nPipes are especially powerful when used to chain together multiple data processing steps. Let’s look at a more substantial example.\nSuppose we want to:\n\nCenter the variable age on 18.\nCreate scale scores for extraversion and neuroticism.\nKeep only participants aged 18 or older.\nSelect only the scale scores and demographic variables.\nSort the data by extraversion in ascending order.\n\nUsing dplyr pipes, we can write:\n\ntmp1 &lt;- bfi %&gt;%\n  mutate(age = age - 18,\n         extra = rowMeans(across(matches(\"^e\\\\d$\")), na.rm = TRUE),\n         neuro = rowMeans(across(matches(\"^n\\\\d$\")), na.rm = TRUE)) %&gt;%\n  filter(age &gt;= 0) %&gt;%\n  select(extra, neuro, age, gen, ed, gm) %&gt;%\n  arrange(extra)\n\nhead(tmp1, 20)\n\n   extra neuro age    gen ed    gm\n1    1.0   1.0   5   male  3   man\n2    1.0   1.0   1   male  3   man\n3    1.6   3.2   0 female  3 woman\n4    1.8   4.0  18 female  2 woman\n5    2.0   6.0  32 female  3 woman\n6    2.2   4.4   5 female  3 woman\n7    2.2   4.6  22   male NA   man\n8    2.2   4.0  17 female  3 woman\n9    2.2   2.6  22 female  3 woman\n10   2.2   4.2   9 female  5 woman\n11   2.2   3.8  36 female  4 woman\n12   2.2   2.8  11 female  3 woman\n13   2.2   6.0   9 female  3 woman\n14   2.2   1.2   3 female  3 woman\n15   2.2   4.2  20 female  3 woman\n16   2.2   1.4  32 female  4 woman\n17   2.4   2.0  50   male  5   man\n18   2.4   3.6   3   male  4   man\n19   2.4   2.8  36 female  3 woman\n20   2.4   1.0   0 female  1 woman\n\n\nEach step is explicit, readable, and self-contained — it’s immediately clear what happens and in what order.\nThe same logic written in base R would be much harder to follow:\n\ntmp2 &lt;- bfi\ntmp2$age   &lt;- tmp2$age - 18\ntmp2$extra &lt;- rowMeans(tmp2[grep(\"^e\\\\d$\", colnames(tmp2))], na.rm = TRUE)\ntmp2$neuro &lt;- rowMeans(tmp2[grep(\"^n\\\\d$\", colnames(tmp2))], na.rm = TRUE)\ntmp2 &lt;- tmp2[tmp2$age &gt;= 0, c(\"extra\", \"neuro\", \"age\", \"gen\", \"ed\", \"gm\")]\ntmp2 &lt;- tmp2[order(tmp2$extra), ]\n\nBoth approaches produce the same result — but the piped version is far clearer.\n\n\nHow Pipes Work\nThe pipe operator simply takes the result from the left-hand side and inserts it as the first argument in the function on the right-hand side.\nThis means the two lines below are equivalent:\n\nmean(bfi$age)\n\n[1] 28.78214\n\nbfi$age %&gt;% mean()\n\n[1] 28.78214\n\n\nThe same applies here:\n\nvar(bfi$a1, na.rm = TRUE)\n\n[1] 1.981724\n\nbfi$a1 %&gt;% var(na.rm = TRUE)\n\n[1] 1.981724\n\n\n\n\nWhat happens when the data isn’t the first argument?\nSome functions — like lm() — don’t take the data frame as the first argument. If you try to use a pipe directly, it won’t work:\n\nbfi %&gt;% lm(extra ~ age)  # Error\n\nError in as.data.frame.default(data): cannot coerce class '\"formula\"' to a data.frame\n\n\nIn these cases, you can use the special placeholder . to tell R explicitly where to insert the piped object:\n\nbfi %&gt;% lm(extra ~ age, data = .)\n\n\nCall:\nlm(formula = extra ~ age, data = .)\n\nCoefficients:\n(Intercept)          age  \n    3.97269      0.00599  \n\n\nThis small trick makes it possible to use pipes with nearly any function, even when the data aren’t the first argument.\n\nPlease enable JavaScript to experience the dynamic code cell content on this page.\n\n\n\n\n\n\nPractice\n\n\n\nUse pipes to perform the following data manipulations on the bfi dataset:\n\nCreate a new variable age_centered that centers age around its mean.\nFilter the dataset to include only participants with age greater than 25.\nSelect only the new centered age variable, the scores for agreeableness and conscientiousness, and the demographic variables gen and ed.\nDisplay the first 20 rows of the resulting dataset.\n\n\n Interactive Editor Solution\n\n\n\nPlease enable JavaScript to experience the dynamic code cell content on this page.\n\n\n\nbfi %&gt;%\n  mutate(age_centered = age - mean(age, na.rm = TRUE)) %&gt;%\n  filter(age &gt; 25) %&gt;%\n  select(age_centered, agree, consc, gen, ed) %&gt;%\n  head(20)\n\n   age_centered agree consc    gen ed\n1    39.2178571   5.6  2.80   male  5\n2    -1.7821429   5.4  3.80 female  2\n3    22.2178571   4.0  5.80 female  5\n4     4.2178571   3.8  4.20 female  3\n5    12.2178571   5.6  4.60 female  3\n6     1.2178571   6.0  6.00   male NA\n7    19.2178571   4.6  5.20 female  5\n8    11.2178571   5.4  3.80 female  3\n9    -1.7821429   3.8  4.00 female  4\n10   14.2178571   3.8  4.40 female  1\n11   -2.7821429   5.2  4.80 female  4\n12   -2.7821429   4.4  4.00   male  4\n13   -2.7821429   4.6  3.80   male  5\n14   21.2178571   5.0  5.40 female  2\n15    0.2178571   4.2  4.80   male  5\n16    3.2178571   4.2  2.80   male  1\n17    3.2178571   5.6  5.25 female  4\n18   -2.7821429   4.0  5.20 female  3\n19   -1.7821429   5.8  5.00 female  5\n20    7.2178571   4.6  4.80 female  5\n\n\n\n\n\n\n\n\n\n\n\n Back to top",
+    "crumbs": [
+      "Open-Stat-Prog",
+      "Pipes",
+      "Using Pipes for Data Manipulation in R"
+    ]
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Advanced Functions in R",
+    "section": "",
+    "text": "Welcome to the module on Advanced Functions in R. This module introduces the core programming tools that make R a truly flexible and powerful language. You’ll learn how to automate repetitive tasks, design your own reusable functions, and connect multiple operations together into clear, efficient workflows. Each tutorial section will conclude with a short knowledge quiz.\nEach tutorial will comprise a series of interactive lessons with practice problems embedded throughout. Each tutorial section will conclude with a short knowledge quiz.",
+    "crumbs": [
+      "Open-Stat-Prog",
+      "Overview"
+    ]
+  },
+  {
+    "objectID": "index.html#learning-goals",
+    "href": "index.html#learning-goals",
+    "title": "Advanced Functions in R",
+    "section": "Learning Goals",
+    "text": "Learning Goals\nAfter completing this module, you will be able to:\n\nPipes\n\nUnderstand how the %&gt;% and |&gt; pipe operators work.\nBuild readable, multi-step pipelines that chain together data transformations.\nUse placeholders and the exposition pipe %$% for more flexible function composition.\n\n\n\nLoops\n\nUse for loops to iterate across elements of vectors or data frames.\nWrite conditional loops (while and repeat) and control flow with break and next.\nRecognize when vectorized operations are a more efficient alternative to looping.\n\n\n\nUser-defined Functions\n\nWrite your own functions to automate repetitive tasks and simplify code.\nUse arguments and default values effectively.\nApply conditional logic and return values to control function output.\n\nClick the button below to get started with the first tutorial.\n\n\n Begin Tutorial",
+    "crumbs": [
+      "Open-Stat-Prog",
+      "Overview"
+    ]
+  },
+  {
+    "objectID": "in_progress.html",
+    "href": "in_progress.html",
+    "title": "In Progress",
+    "section": "",
+    "text": "Sorry, we’re still building the page you’ve requested.\nIt’s almost done…really.\nWe’re just working through a few minor issues…\n\n\n\nImage Source"
+  },
+  {
+    "objectID": "quizzes/user_fun/questions/default_arguments1.html",
+    "href": "quizzes/user_fun/questions/default_arguments1.html",
+    "title": "Question",
+    "section": "",
+    "text": "Which section of an R package help file would you reference to learn the default values for a function’s arguments.\n\n\n\nDescription\nUsage\nArguments\nDetails\nValue\nSee Also\nExamples"
+  },
+  {
+    "objectID": "quizzes/user_fun/questions/default_arguments1.html#answerlist",
+    "href": "quizzes/user_fun/questions/default_arguments1.html#answerlist",
+    "title": "Question",
+    "section": "",
+    "text": "Description\nUsage\nArguments\nDetails\nValue\nSee Also\nExamples"
+  },
+  {
+    "objectID": "quizzes/user_fun/questions/bad_question.html",
+    "href": "quizzes/user_fun/questions/bad_question.html",
+    "title": "Question",
+    "section": "",
+    "text": "Yes or No?\n\n\n\nYes\nYes\nYes\nYes\nYes\nNo\nNo\nNo\nNo\nNo"
+  },
+  {
+    "objectID": "quizzes/user_fun/questions/bad_question.html#answerlist",
+    "href": "quizzes/user_fun/questions/bad_question.html#answerlist",
+    "title": "Question",
+    "section": "",
+    "text": "Yes\nYes\nYes\nYes\nYes\nNo\nNo\nNo\nNo\nNo"
+  },
+  {
+    "objectID": "quizzes/user_fun/questions/bad_question.html#answerlist-1",
+    "href": "quizzes/user_fun/questions/bad_question.html#answerlist-1",
+    "title": "Question",
+    "section": "Answerlist",
+    "text": "Answerlist\n\nCorrect\nWrong\nWrong\nWrong\nWrong\nWrong\nWrong\nWrong\nWrong\nWrong"
+  },
+  {
+    "objectID": "quizzes/user_fun/questions/fix.html",
+    "href": "quizzes/user_fun/questions/fix.html",
+    "title": "Question",
+    "section": "",
+    "text": "Question\nThis function is supposed to return the cube of x, but there is something wrong with it. Fix the body of the function so that it correctly returns the cube of x.\n\ncube &lt;- function(x) {\n  print(x^3)\n}\n\n\n\nSolution\nThe issue with the function is that it uses print() instead of return(). To fix it, we should replace print(x^3) with return(x^3).\n\n\nMeta-information\nexname: Arithmetic extype: str exsolution: return(x^3)\n\n\n\n\n Back to top"
+  },
+  {
+    "objectID": "quizzes/loop/questions/vect.html",
+    "href": "quizzes/loop/questions/vect.html",
+    "title": "Question",
+    "section": "",
+    "text": "Which of the following is a vectorized operation in R?\n\n\n\ny &lt;- x + 1\nlapply(x, function(i) i + 1)\nx * y * z inside a loop\napply(x, 1, sum)\ny &lt;- paste(x)\ny &lt;- c()\nx &lt;- runif\nfor (i in 1:length(x)) y[i] &lt;- x[i] + 1\nrepeat { y &lt;- x + 1 }\nif (x + 1) y"
+  },
+  {
+    "objectID": "quizzes/loop/questions/vect.html#answerlist",
+    "href": "quizzes/loop/questions/vect.html#answerlist",
+    "title": "Question",
+    "section": "",
+    "text": "y &lt;- x + 1\nlapply(x, function(i) i + 1)\nx * y * z inside a loop\napply(x, 1, sum)\ny &lt;- paste(x)\ny &lt;- c()\nx &lt;- runif\nfor (i in 1:length(x)) y[i] &lt;- x[i] + 1\nrepeat { y &lt;- x + 1 }\nif (x + 1) y"
+  },
+  {
+    "objectID": "quizzes/loop/questions/vect.html#answerlist-1",
+    "href": "quizzes/loop/questions/vect.html#answerlist-1",
+    "title": "Question",
+    "section": "Answerlist",
+    "text": "Answerlist\n\nTRUE: This is a vectorized operation; R adds 1 to each element of x simultaneously.\nTRUE: lapply applies the function to each element of x, which is a form of vectorization.\nTRUE: Multiplying vectors element-wise is a vectorized operation, evwn if it’s inside a loop.\nTRUE: apply applies the sum function across rows of x, which is vectorized.\nTRUE: paste is vectorized and can operate on each element of x.\nFALSE: This simply initializes an empty vector, not a vectorized operation.\nFALSE: This assigns the function runif to x, not a vectorized operation.\nFALSE: This is a for loop, not vectorized.\nFALSE: This is an infinite repeat loop, not vectorized.\nFALSE: The if statement is not vectorized; it expects a single logical value."
+  },
+  {
+    "objectID": "quizzes/loop/questions/default_arguments2.html",
+    "href": "quizzes/loop/questions/default_arguments2.html",
+    "title": "Question",
+    "section": "",
+    "text": "Use the following help file excerpt to answer the question below.\n\n\n\n\n\n\n\n\ncor\nR Documentation\n\n\n\n\n\n\n\n\n\nvar(x, y = NULL, na.rm = FALSE, use)\n\ncov(x, y = NULL, use = \"everything\",\n    method = c(\"pearson\", \"kendall\", \"spearman\"))\n\ncor(x, y = NULL, use = \"everything\",\n    method = c(\"pearson\", \"kendall\", \"spearman\"))\n\ncov2cor(V)\n\n\n\n\n\n\n\n\nWhat is the default value for the use argument of the cor() function?\n\n\n\n\"everything\"\n\"Everything\n\"spearman\"\n\"pearson\"\n\"kendall\"\nc(\"pearson\", \"spearman\", \"kendall\")\nNULL\nmethod\ny\nx\nThe use argument does not have a defined default value."
+  },
+  {
+    "objectID": "quizzes/loop/questions/default_arguments2.html#answerlist",
+    "href": "quizzes/loop/questions/default_arguments2.html#answerlist",
+    "title": "Question",
+    "section": "",
+    "text": "\"everything\"\n\"Everything\n\"spearman\"\n\"pearson\"\n\"kendall\"\nc(\"pearson\", \"spearman\", \"kendall\")\nNULL\nmethod\ny\nx\nThe use argument does not have a defined default value."
+  },
+  {
+    "objectID": "quizzes/loop/questions/default_arguments2.html#answerlist-1",
+    "href": "quizzes/loop/questions/default_arguments2.html#answerlist-1",
+    "title": "Question",
+    "section": "Answerlist",
+    "text": "Answerlist\n\nCorrect\nWrong: The “E” should be lowercase\nWrong: This is one of the possible methods\nWrong: This is one of the possible methods\nWrong: This is one of the possible methods\nWrong: These are all of the possible methods\nWrong: This is the default value for y\nWrong: This is an argument name\nWrong: This is an argument name\nWrong: This is an argument name\nWrong: There is a default value defined for use."
+  },
+  {
+    "objectID": "quizzes/loop/questions/next.html",
+    "href": "quizzes/loop/questions/next.html",
+    "title": "Question",
+    "section": "",
+    "text": "Question\nWhat is missing in the following R code so that the loop returns these values?\n\nfor (i in 1:10) {\n  __________________\n  a &lt;- i^2 \n  print(a)\n}\n\n\n\n[1] 1\n[1] 4\n[1] 9\n[1] 16\n[1] 36\n[1] 49\n[1] 64\n[1] 81\n[1] 100\n\n\n\n\nSolution\nTo skip the iteration when i is equal to 5, you need to add a conditional statement that checks for this condition and uses the next function to skip to the next iteration of the loop. The missing line is: if (i == 5) next.\n\n\nMeta-information\nexname: next extype: str exsolution: if (i == 5) next\n\n\n\n\n Back to top"
+  },
+  {
+    "objectID": "quizzes/loop/questions/arithmetic2.html",
+    "href": "quizzes/loop/questions/arithmetic2.html",
+    "title": "Question",
+    "section": "",
+    "text": "Question\nThis function is supposed to return the cube of x, but there is something wrong with it. Fix the body of the function so that it correctly returns the cube of x.\n\ncube &lt;- function(x) {\n  print(x^3)\n}\n\n\n\nSolution\nThe issue with the function is that it uses print() instead of return(). To fix it, we should replace print(x^3) with return(x^3).\n\n\nMeta-information\nexname: Arithmetic extype: str exsolution: return(x^3)\n\n\n\n\n Back to top"
+  },
+  {
+    "objectID": "quizzes/pipes/questions/bmi.html",
+    "href": "quizzes/pipes/questions/bmi.html",
+    "title": "Question",
+    "section": "",
+    "text": "Question\nUsing %&gt;%, write (in one line) how you would compute the squared variance of the column bmi inside health, assuming bmi exists.\n\n\nSolution\nThe correct code is health$bmi %&gt;% var() %&gt;% sqrt().\n\n\nMeta-information\nexname: Squared Variance of BMI extype: str exsolution: health %&gt;% pull(bmi) %&gt;% var()\n\n\n\n\n Back to top"
+  },
+  {
+    "objectID": "quizzes/pipes/questions/default_arguments2.html",
+    "href": "quizzes/pipes/questions/default_arguments2.html",
+    "title": "Question",
+    "section": "",
+    "text": "Use the following help file excerpt to answer the question below.\n\n\n\n\n\n\n\n\ncor\nR Documentation\n\n\n\n\n\n\n\n\n\nvar(x, y = NULL, na.rm = FALSE, use)\n\ncov(x, y = NULL, use = \"everything\",\n    method = c(\"pearson\", \"kendall\", \"spearman\"))\n\ncor(x, y = NULL, use = \"everything\",\n    method = c(\"pearson\", \"kendall\", \"spearman\"))\n\ncov2cor(V)\n\n\n\n\n\n\n\n\nWhat is the default value for the use argument of the cor() function?\n\n\n\n\"everything\"\n\"Everything\n\"spearman\"\n\"pearson\"\n\"kendall\"\nc(\"pearson\", \"spearman\", \"kendall\")\nNULL\nmethod\ny\nx\nThe use argument does not have a defined default value."
+  },
+  {
+    "objectID": "quizzes/pipes/questions/default_arguments2.html#answerlist",
+    "href": "quizzes/pipes/questions/default_arguments2.html#answerlist",
+    "title": "Question",
+    "section": "",
+    "text": "\"everything\"\n\"Everything\n\"spearman\"\n\"pearson\"\n\"kendall\"\nc(\"pearson\", \"spearman\", \"kendall\")\nNULL\nmethod\ny\nx\nThe use argument does not have a defined default value."
+  },
+  {
+    "objectID": "quizzes/pipes/questions/default_arguments2.html#answerlist-1",
+    "href": "quizzes/pipes/questions/default_arguments2.html#answerlist-1",
+    "title": "Question",
+    "section": "Answerlist",
+    "text": "Answerlist\n\nCorrect\nWrong: The “E” should be lowercase\nWrong: This is one of the possible methods\nWrong: This is one of the possible methods\nWrong: This is one of the possible methods\nWrong: These are all of the possible methods\nWrong: This is the default value for y\nWrong: This is an argument name\nWrong: This is an argument name\nWrong: This is an argument name\nWrong: There is a default value defined for use."
+  },
+  {
+    "objectID": "quizzes/pipes/questions/logical.html",
+    "href": "quizzes/pipes/questions/logical.html",
+    "title": "Question",
+    "section": "",
+    "text": "What is the key difference between a for loop and a while loop?\n\n\n\nA for loop repeats a fixed number of times; a while loop repeats until a condition becomes false.\nA for loop is slower than a while loop.\nA for loop can only iterate over numeric vectors.\nA while loop cannot contain conditional statements.\nA while loop must always run at least once.\nA for loop cannot modify objects outside the loop.\nA for loop checks its condition at the end of the loop.\nA while loop cannot iterate over data frame columns.\nA for loop cannot be nested inside another loop.\nBoth loops behave the same; the difference is only stylistic."
+  },
+  {
+    "objectID": "quizzes/pipes/questions/logical.html#answerlist",
+    "href": "quizzes/pipes/questions/logical.html#answerlist",
+    "title": "Question",
+    "section": "",
+    "text": "A for loop repeats a fixed number of times; a while loop repeats until a condition becomes false.\nA for loop is slower than a while loop.\nA for loop can only iterate over numeric vectors.\nA while loop cannot contain conditional statements.\nA while loop must always run at least once.\nA for loop cannot modify objects outside the loop.\nA for loop checks its condition at the end of the loop.\nA while loop cannot iterate over data frame columns.\nA for loop cannot be nested inside another loop.\nBoth loops behave the same; the difference is only stylistic."
+  },
+  {
+    "objectID": "quizzes/pipes/questions/logical.html#answerlist-1",
+    "href": "quizzes/pipes/questions/logical.html#answerlist-1",
+    "title": "Question",
+    "section": "Answerlist",
+    "text": "Answerlist\n\nTRUE\nFALSE:\nTRUE: 14 is strictly less than 48\nTRUE: 7 is equal to 7, and 7 is greater than or equal to 7\nTRUE: “alice” is not equal to “bob”, but “alice is equal to”alice”\nTRUE: 6 is not strictly greater than 7, and that result is negated\nTRUE: Trivially\nFALSE: Trivially\nFALSE: “foo” is not equal to “bar”\nFALSE: 7 is equal to 7, but 7 is not strictly greater than 7\nFALSE: “alice” is not equal to “bob”, and “alice” is equal to “alice”\nFALSE: “alice” is not equal to “bob”\nFALSE: Trivial negation\nFALSE: Trivially"
+  },
+  {
+    "objectID": "quizzes/pipes/questions/arithmetic2.html",
+    "href": "quizzes/pipes/questions/arithmetic2.html",
+    "title": "Question",
+    "section": "",
+    "text": "Question\nUsing %&gt;%, write (in one line) how you would compute the squared variance of the column bmi inside health, assuming bmi exists.\n\n\nSolution\nThe correct code is health$bmi %&gt;% var() %&gt;% sqrt().\n\n\nMeta-information\nexname: Arithmetic extype: str exsolution: health %&gt;% pull(bmi) %&gt;% var() extol: 0.01\n\n\n\n\n Back to top"
+  },
+  {
+    "objectID": "quizzes/pipes/questions/mean.html",
+    "href": "quizzes/pipes/questions/mean.html",
+    "title": "Question",
+    "section": "",
+    "text": "Which command correctly uses pipes to compute the mean of the variable age in bfi?\n\n\n\nbfi$age %&gt;% mean()\nbfi %$% mean(age)\nbfi$age |&gt; mean()\nbfi %&gt;% .$age %&gt;% mean()\nbfi %&gt;% mean(age)\nmean(bfi$age) %&gt;% ()\nbfi |&gt; mean(age)\nbfi %&gt;% mean()$age\nbfi %&gt;% mean(age, .)\nmean() %&gt;% bfi$age"
+  },
+  {
+    "objectID": "quizzes/pipes/questions/mean.html#answerlist",
+    "href": "quizzes/pipes/questions/mean.html#answerlist",
+    "title": "Question",
+    "section": "",
+    "text": "bfi$age %&gt;% mean()\nbfi %$% mean(age)\nbfi$age |&gt; mean()\nbfi %&gt;% .$age %&gt;% mean()\nbfi %&gt;% mean(age)\nmean(bfi$age) %&gt;% ()\nbfi |&gt; mean(age)\nbfi %&gt;% mean()$age\nbfi %&gt;% mean(age, .)\nmean() %&gt;% bfi$age"
+  },
+  {
+    "objectID": "quizzes/pipes/questions/mean.html#answerlist-1",
+    "href": "quizzes/pipes/questions/mean.html#answerlist-1",
+    "title": "Question",
+    "section": "Answerlist",
+    "text": "Answerlist\n\nTRUE: This command correctly uses the pipe operator %&gt;% to pass bfi$age to the mean() function.\nTRUE: This command correctly uses the magrittr pipe operator %$% to expose the columns of bfi and then computes the mean of age.\nTRUE: This command correctly uses the base R pipe operator |&gt; to pass bfi$age to the mean() function.\nTRUE: This command correctly uses the pipe operator %&gt;% to extract age from bfi and then computes the mean.\nFALSE: This command incorrectly attempts to compute the mean of age directly on the bfi data frame without extracting the age variable first.\nFALSE: This command incorrectly attempts to pipe the result of mean(bfi$age) into an empty function call ().\nFALSE: This command incorrectly attempts to compute the mean of age directly on the bfi data frame using the base R pipe operator |&gt;.\nFALSE: This command incorrectly attempts to access age from the result of mean() called on bfi.\nFALSE: This command incorrectly attempts to compute the mean of age by passing age as an argument to mean() without extracting it from bfi.\nFALSE: This command incorrectly attempts to pipe the result of mean() into bfi$age. Meta-information ================ exname: mean extype: mchoice exsolution: 1111000000 exshuffle: 5"
+  },
+  {
+    "objectID": "quizzes/pipes/questions/webr.html",
+    "href": "quizzes/pipes/questions/webr.html",
+    "title": "Question",
+    "section": "",
+    "text": "Question\n\nPlease enable JavaScript to experience the dynamic code cell content on this page.\nUsing a pipeline, calculate the mean of the agree variable for participants who are older than 30 years. Use the WebR to write your code and insert the result in the box, rounding to two decimal places.\n\nPlease enable JavaScript to experience the dynamic code cell content on this page.\nRound your answer to two decimal places.\n\n\nSolution\nThe correct pipeline code to calculate the mean of the agree variable for participants older than 30 years is:\nbfi %&gt;% filter(age&gt;30) %&gt;% select(agree) %&gt;% unlist() %&gt;% mean()\nAfter rounding, we get 4.84.\n\n\nMeta-information\nexname: WebR extype: num exsolution: 4.84 extol: 0.01\n\n\n\n\n Back to top"
+  },
+  {
+    "objectID": "quizzes/pipes/questions/placeholder.html",
+    "href": "quizzes/pipes/questions/placeholder.html",
+    "title": "Question",
+    "section": "",
+    "text": "Which use of the placeholder . is valid when the data are not the first argument?\n\n\n\nbfi %&gt;% lm(extra ~ age, .)\nbfi %&gt;% lm(extra ~ age, data = .)\nbfi %&gt;% lm(extra ~ age)\nbfi %&gt;% .(extra ~ age)\nlm(data = bfi, extra ~ age) %&gt;% .\nlm(extra ~ age, data = .) %&gt;% bfi\nbfi %&gt;% lm(., extra ~ age)\nbfi |&gt; lm(extra ~ age, data = .)\nbfi |&gt; data = . |&gt; lm(extra ~ age)"
+  },
+  {
+    "objectID": "quizzes/pipes/questions/placeholder.html#answerlist",
+    "href": "quizzes/pipes/questions/placeholder.html#answerlist",
+    "title": "Question",
+    "section": "",
+    "text": "bfi %&gt;% lm(extra ~ age, .)\nbfi %&gt;% lm(extra ~ age, data = .)\nbfi %&gt;% lm(extra ~ age)\nbfi %&gt;% .(extra ~ age)\nlm(data = bfi, extra ~ age) %&gt;% .\nlm(extra ~ age, data = .) %&gt;% bfi\nbfi %&gt;% lm(., extra ~ age)\nbfi |&gt; lm(extra ~ age, data = .)\nbfi |&gt; data = . |&gt; lm(extra ~ age)"
+  },
+  {
+    "objectID": "quizzes/pipes/questions/placeholder.html#answerlist-1",
+    "href": "quizzes/pipes/questions/placeholder.html#answerlist-1",
+    "title": "Question",
+    "section": "Answerlist",
+    "text": "Answerlist\n\nTRUE: This use of the placeholder is the correct syntax for passing the data argument in a pipe.\nTRUE: This use of the placeholder is the correct for passing the data argument in a pipe.\nFALSE: The placeholder is not used; the data argument is missing.\nFALSE: The placeholder is incorrectly used as a function.\nFALSE: The placeholder is incorrectly used after the function call.\nFALSE: The placeholder is incorrectly used after the pipe operator.\nFALSE: The placeholder is incorrectly used as the first argument.\nFALSE: This use of the placeholder is the correct syntax for passing the data argument in a pipe, but it will not work with the base R pipe operator.\nFALSE: The syntax is incorrect; the placeholder cannot be used in this way."
+  },
+  {
+    "objectID": "quizzes/pipes/index.html",
+    "href": "quizzes/pipes/index.html",
+    "title": "Knowledge Quiz: Tutorial 1",
+    "section": "",
+    "text": "Note\n\n\n\n\nClick the check-mark button to check your answer.\nClick the question-mark button to see an explanation of the solution.\n\n\n\n\n\n\nWhich command correctly uses pipes to compute the mean of the variable age in bfi?\n\nmean() %&gt;% bfi$agebfi %&gt;% mean()$agebfi |&gt; mean(age)bfi$age |&gt; mean()bfi %&gt;% .$age %&gt;% mean()\n\n\n\n\nNA\nFALSE: This command incorrectly attempts to access age from the result of mean() called on bfi.\nFALSE: This command incorrectly attempts to compute the mean of age directly on the bfi data frame using the base R pipe operator |&gt;.\nTRUE: This command correctly uses the base R pipe operator |&gt; to pass bfi$age to the mean() function.\nTRUE: This command correctly uses the pipe operator %&gt;% to extract age from bfi and then computes the mean.\n\n\n\n\n\nWhich use of the placeholder . is valid when the data are not the first argument?\n\nlm(data = bfi, extra ~ age) %&gt;% .bfi %&gt;% .(extra ~ age)bfi %&gt;% lm(., extra ~ age)bfi |&gt; lm(extra ~ age, data = .)bfi %&gt;% lm(extra ~ age, .)\n\n\n\n\nFALSE: The placeholder is incorrectly used after the function call.\nFALSE: The placeholder is incorrectly used as a function.\nFALSE: The placeholder is incorrectly used as the first argument.\nFALSE: This use of the placeholder is the correct syntax for passing the data argument in a pipe, but it will not work with the base R pipe operator.\nTRUE: This use of the placeholder is the correct syntax for passing the data argument in a pipe.\n\n\n\n\n\nUsing %&gt;%, write (in one line) how you would compute the squared variance of the column bmi inside health, assuming bmi exists.\n\n\n\nThe correct code is health$bmi %&gt;% var() %&gt;% sqrt().\n\n\n\n\n\nPlease enable JavaScript to experience the dynamic code cell content on this page.\nUsing a pipeline, calculate the mean of the agree variable for participants who are older than 30 years. Use the WebR to write your code and insert the result in the box, rounding to two decimal places.\n\nPlease enable JavaScript to experience the dynamic code cell content on this page.\nRound your answer to two decimal places.\n\n\n\nThe correct pipeline code to calculate the mean of the agree variable for participants older than 30 years is:\nbfi %&gt;% filter(age&gt;30) %&gt;% select(agree) %&gt;% unlist() %&gt;% mean()\nAfter rounding, we get 4.84.\n\n\n\n\n\n\n Back to top",
+    "crumbs": [
+      "Open-Stat-Prog",
+      "Pipes",
+      "Knowledge Quiz"
+    ]
+  },
+  {
+    "objectID": "quizzes/loop/questions/def.html",
+    "href": "quizzes/loop/questions/def.html",
+    "title": "Question",
+    "section": "",
+    "text": "Which function definition includes a default argument?\n\n\n\nf &lt;- function(x) x + y\nf &lt;- function(x = 3) { x^2 }\nf &lt;- function(x, y) { x*y }\nf &lt;- function() { x }\nf &lt;- function(x + 1) { x }\nf &lt;- function(default = ) { x }\nf &lt;- function(x &lt;- 3) x\nf &lt;- function(x:3) x+1\nf &lt;- function(x -&gt; 3) { x^2 }\nf &lt;- function(NA) return()"
+  },
+  {
+    "objectID": "quizzes/loop/questions/def.html#answerlist",
+    "href": "quizzes/loop/questions/def.html#answerlist",
+    "title": "Question",
+    "section": "",
+    "text": "f &lt;- function(x) x + y\nf &lt;- function(x = 3) { x^2 }\nf &lt;- function(x, y) { x*y }\nf &lt;- function() { x }\nf &lt;- function(x + 1) { x }\nf &lt;- function(default = ) { x }\nf &lt;- function(x &lt;- 3) x\nf &lt;- function(x:3) x+1\nf &lt;- function(x -&gt; 3) { x^2 }\nf &lt;- function(NA) return()"
+  },
+  {
+    "objectID": "quizzes/loop/questions/def.html#answerlist-1",
+    "href": "quizzes/loop/questions/def.html#answerlist-1",
+    "title": "Question",
+    "section": "Answerlist",
+    "text": "Answerlist\n\nFALSE: The x argument has no default value.\nTRUE: The x argument has a default value of 3.\nFALSE: Neither x nor y have default values.\nFALSE: The function has no arguments.\nFALSE: This is not a valid function definition.\nFALSE: This is not a valid function definition.\nFALSE: This is not a valid function definition.\nFALSE: This is not a valid function definition.\nFALSE: This is not a valid function definition.\nFALSE: This is not a valid function definition."
+  },
+  {
+    "objectID": "quizzes/loop/questions/logical.html",
+    "href": "quizzes/loop/questions/logical.html",
+    "title": "Question",
+    "section": "",
+    "text": "Which correctly uses break to exit a loop once i equals 3?\n\n\n\nfor (i in 1:5) { if (i == 3) break; print(i) }\nfor (i in 1:5) { break(i == 3); print(i) }\nfor (i == 3 in 1:5) break\nfor (i in 1:5) break print(i)\nfor (i in 1:5) if i == 3 break else print(i)\ni &lt;- 1; break(for (i in 1:5))\nfor (i in 1:5) { print(i) break(i==3) }\nfor (i in 1:3) print(i); break\nbreak for i in 1:5\nfor (i in 1:5) print(i==3)"
+  },
+  {
+    "objectID": "quizzes/loop/questions/logical.html#answerlist",
+    "href": "quizzes/loop/questions/logical.html#answerlist",
+    "title": "Question",
+    "section": "",
+    "text": "for (i in 1:5) { if (i == 3) break; print(i) }\nfor (i in 1:5) { break(i == 3); print(i) }\nfor (i == 3 in 1:5) break\nfor (i in 1:5) break print(i)\nfor (i in 1:5) if i == 3 break else print(i)\ni &lt;- 1; break(for (i in 1:5))\nfor (i in 1:5) { print(i) break(i==3) }\nfor (i in 1:3) print(i); break\nbreak for i in 1:5\nfor (i in 1:5) print(i==3)"
+  },
+  {
+    "objectID": "quizzes/loop/questions/logical.html#answerlist-1",
+    "href": "quizzes/loop/questions/logical.html#answerlist-1",
+    "title": "Question",
+    "section": "Answerlist",
+    "text": "Answerlist\n\nTRUE\nFALSE: Incorrect use of break as a function.\nFALSE: Incorrect syntax for loop variable assignment.\nFALSE: Wrong syntax for break statement.\nFALSE: Missing curly braces for if-else statement.\nFALSE: Incorrect use of break outside of loop.\nFALSE: Incorrect use of break as a function.\nFALSE: Break statement is outside the loop.\nFALSE: Incorrect syntax for break statement.\nFALSE: Does not exit loop; just prints logical comparison."
+  },
+  {
+    "objectID": "quizzes/loop/questions/for_vs_while.html",
+    "href": "quizzes/loop/questions/for_vs_while.html",
+    "title": "Question",
+    "section": "",
+    "text": "What is the key difference between a for loop and a while loop?\n\n\n\nA for loop repeats a fixed number of times; a while loop repeats until a condition becomes false.\nA for loop is slower than a while loop.\nA while loop cannot contain conditional statements.\nA for loop can only iterate over numeric vectors.\nA while loop must always run at least once.\nA for loop cannot modify objects outside the loop.\nA for loop checks its condition at the end of the loop.\nA while loop cannot iterate over data frame columns.\nA for loop cannot be nested inside another loop.\nBoth loops behave the same; the difference is only stylistic."
+  },
+  {
+    "objectID": "quizzes/loop/questions/for_vs_while.html#answerlist",
+    "href": "quizzes/loop/questions/for_vs_while.html#answerlist",
+    "title": "Question",
+    "section": "",
+    "text": "A for loop repeats a fixed number of times; a while loop repeats until a condition becomes false.\nA for loop is slower than a while loop.\nA while loop cannot contain conditional statements.\nA for loop can only iterate over numeric vectors.\nA while loop must always run at least once.\nA for loop cannot modify objects outside the loop.\nA for loop checks its condition at the end of the loop.\nA while loop cannot iterate over data frame columns.\nA for loop cannot be nested inside another loop.\nBoth loops behave the same; the difference is only stylistic."
+  },
+  {
+    "objectID": "quizzes/loop/questions/for_vs_while.html#answerlist-1",
+    "href": "quizzes/loop/questions/for_vs_while.html#answerlist-1",
+    "title": "Question",
+    "section": "Answerlist",
+    "text": "Answerlist\n\nTRUE\nFALSE: a for loop is not necessarily slower than a while loop; performance depends on context.\nFALSE: a while loop can contain conditional statements.\nFALSE: a for loop can iterate over any iterable object, not just numeric vectors.\nFALSE: a while loop may not run at all if the condition is false at the start.\nFALSE: a for loop can modify objects outside the loop.\nFALSE: a for loop checks its condition at the beginning of the loop.\nFALSE: a while loop can iterate over data frame columns.\nFALSE: a for loop can be nested inside another loop.\nFALSE: Both loops have different behaviors and use cases.\nTRUE: 14 is strictly less than 48\nTRUE: 7 is equal to 7, and 7 is greater than or equal to 7\nTRUE: “alice” is not equal to “bob”, but “alice is equal to”alice”\nTRUE: 6 is not strictly greater than 7, and that result is negated\nTRUE: Trivially\nFALSE: Trivially\nFALSE: “foo” is not equal to “bar”\nFALSE: 7 is equal to 7, but 7 is not strictly greater than 7\nFALSE: “alice” is not equal to “bob”, and “alice” is equal to “alice”\nFALSE: “alice” is not equal to “bob”\nFALSE: Trivial negation\nFALSE: Trivially"
+  },
+  {
+    "objectID": "quizzes/loop/index.html",
+    "href": "quizzes/loop/index.html",
+    "title": "Knowledge Quiz: Tutorial 1",
+    "section": "",
+    "text": "Note\n\n\n\n\nClick the check-mark button to check your answer.\nClick the question-mark button to see an explanation of the solution.\n\n\n\n\n\n\nWhat is the key difference between a for loop and a while loop?\n\nA for loop repeats a fixed number of times; a while loop repeats until a condition becomes false.Both loops behave the same; the difference is only stylistic.A for loop cannot modify objects outside the loop.A for loop checks its condition at the end of the loop.A for loop cannot be nested inside another loop.\n\n\n\n\nTRUE\nFALSE: Both loops have different behaviors and use cases.\nFALSE: a for loop can modify objects outside the loop.\nFALSE: a for loop checks its condition at the beginning of the loop.\nFALSE: a for loop can be nested inside another loop.\n\n\n\n\n\nWhich of the following is a vectorized operation in R?\n\nfor (i in 1:length(x)) y[i] &lt;- x[i] + 1y &lt;- paste(x)y &lt;- x + 1lapply(x, function(i) i + 1)apply(x, 1, sum)\n\n\n\n\nFALSE: This is a for loop, not vectorized.\nTRUE: paste is vectorized and can operate on each element of x.\nTRUE: This is a vectorized operation; R adds 1 to each element of x simultaneously.\nTRUE: lapply applies the function to each element of x, which is a form of vectorization.\nTRUE: apply applies the sum function across rows of x, which is vectorized.\n\n\n\n\n\nWhat is missing in the following R code so that the loop returns these values?\n\n{. .cell-code} for (i in 1:10) {   __________________   a &lt;- i^2    print(a) }\n\n\n\n[1] 1\n[1] 4\n[1] 9\n[1] 16\n[1] 36\n[1] 49\n[1] 64\n[1] 81\n[1] 100\n\n\n\n\n\nTo skip the iteration when i is equal to 5, you need to add a conditional statement that checks for this condition and uses the next function to skip to the next iteration of the loop. The missing line is: if (i == 5) next.\n\n\n\n\n\n\n Back to top",
+    "crumbs": [
+      "Open-Stat-Prog",
+      "Loops",
+      "Knowledge Quiz"
+    ]
+  },
+  {
+    "objectID": "quizzes/user_fun/questions/def.html",
+    "href": "quizzes/user_fun/questions/def.html",
+    "title": "Question",
+    "section": "",
+    "text": "Which function definition includes a default argument?\n\n\n\nf &lt;- function(x) x + y\nf &lt;- function(x = 3) { x^2 }\nf &lt;- function(x, y) { x*y }\nf &lt;- function() { x }\nf &lt;- function(x + 1) { x }\nf &lt;- function(default = ) { x }\nf &lt;- function(x &lt;- 3) x\nf &lt;- function(x:3) x+1\nf &lt;- function(x -&gt; 3) { x^2 }\nf &lt;- function(NA) return()"
+  },
+  {
+    "objectID": "quizzes/user_fun/questions/def.html#answerlist",
+    "href": "quizzes/user_fun/questions/def.html#answerlist",
+    "title": "Question",
+    "section": "",
+    "text": "f &lt;- function(x) x + y\nf &lt;- function(x = 3) { x^2 }\nf &lt;- function(x, y) { x*y }\nf &lt;- function() { x }\nf &lt;- function(x + 1) { x }\nf &lt;- function(default = ) { x }\nf &lt;- function(x &lt;- 3) x\nf &lt;- function(x:3) x+1\nf &lt;- function(x -&gt; 3) { x^2 }\nf &lt;- function(NA) return()"
+  },
+  {
+    "objectID": "quizzes/user_fun/questions/def.html#answerlist-1",
+    "href": "quizzes/user_fun/questions/def.html#answerlist-1",
+    "title": "Question",
+    "section": "Answerlist",
+    "text": "Answerlist\n\nFALSE: The x argument has no default value.\nTRUE: The x argument has a default value of 3.\nFALSE: Neither x nor y have default values.\nFALSE: The function has no arguments.\nFALSE: This is not a valid function definition.\nFALSE: This is not a valid function definition.\nFALSE: This is not a valid function definition.\nFALSE: This is not a valid function definition.\nFALSE: This is not a valid function definition.\nFALSE: This is not a valid function definition."
+  },
+  {
+    "objectID": "quizzes/user_fun/questions/square.html",
+    "href": "quizzes/user_fun/questions/square.html",
+    "title": "Question",
+    "section": "",
+    "text": "Which function correctly squares each element of a vector v?\n\n\n\nsquare &lt;- function(v) v^2\nsquare(v) &lt;- function() v^2\nsquare &lt;- function(v) for (i in v) i^2\nsquare &lt;- function(v) return(v)^2\nsquare &lt;- function(v) mean(v^2)\nsquare &lt;- function(x) x * v\nsquare &lt;- function() v^2\nsquare &lt;- function(v) { for(i in v) print(i^2) }\nsquare &lt;- function(v) c(v, v)\nsquare &lt;- for (i in v) i^2"
+  },
+  {
+    "objectID": "quizzes/user_fun/questions/square.html#answerlist",
+    "href": "quizzes/user_fun/questions/square.html#answerlist",
+    "title": "Question",
+    "section": "",
+    "text": "square &lt;- function(v) v^2\nsquare(v) &lt;- function() v^2\nsquare &lt;- function(v) for (i in v) i^2\nsquare &lt;- function(v) return(v)^2\nsquare &lt;- function(v) mean(v^2)\nsquare &lt;- function(x) x * v\nsquare &lt;- function() v^2\nsquare &lt;- function(v) { for(i in v) print(i^2) }\nsquare &lt;- function(v) c(v, v)\nsquare &lt;- for (i in v) i^2"
+  },
+  {
+    "objectID": "quizzes/user_fun/questions/square.html#answerlist-1",
+    "href": "quizzes/user_fun/questions/square.html#answerlist-1",
+    "title": "Question",
+    "section": "Answerlist",
+    "text": "Answerlist\n\nTRUE: This function correctly squares each element of vector v.\nFALSE: The argument assignment is incorrect; it should be function(v).\nFALSE: This function does not return a vector; it only iterates through elements without storing results.\nFALSE: The return statement is misused; it should return the squared vector directly.\nFALSE: This function returns the mean of squared elements, not the squared vector.\nFALSE: The function uses an undefined variable v instead of the argument x.\nFALSE: The function lacks an argument to accept the vector v.\nFALSE: This function prints squared values but does not return a vector of squared elements.\nFALSE: This function concatenates the vector with itself instead of squaring its elements.\nFALSE: It is not a function"
+  },
+  {
+    "objectID": "quizzes/user_fun/index.html",
+    "href": "quizzes/user_fun/index.html",
+    "title": "Knowledge Quiz: Tutorial 2",
+    "section": "",
+    "text": "Note\n\n\n\n\nClick the check-mark button to check your answer.\nClick the question-mark button to see an explanation of the solution.\n\n\n\n\n\n\nWhich function definition includes a default argument?\n\nf &lt;- function(x &lt;- 3) xf &lt;- function(x + 1) { x }f &lt;- function(x, y) { x*y }f &lt;- function(x) x + yf &lt;- function(x -&gt; 3) { x^2 }\n\n\n\n\nFALSE: This is not a valid function definition.\nFALSE: This is not a valid function definition.\nFALSE: Neither x nor y have default values.\nFALSE: The x argument has no default value.\nFALSE: This is not a valid function definition.\n\n\n\n\n\nWhich function correctly squares each element of a vector v?\n\nsquare &lt;- function() v^2square &lt;- function(v) { for(i in v) print(i^2) }square &lt;- function(v) return(v)^2square &lt;- function(x) x * vsquare &lt;- function(v) v^2\n\n\n\n\nFALSE: The function lacks an argument to accept the vector v.\nFALSE: This function prints squared values but does not return a vector of squared elements.\nFALSE: The return statement is misused; it should return the squared vector directly.\nFALSE: The function uses an undefined variable v instead of the argument x.\nTRUE: This function correctly squares each element of vector v.\n\n\n\n\n\nThis function is supposed to return the cube of x, but there is something wrong with it. Fix the body of the function so that it correctly returns the cube of x.\n\n{. .cell-code} cube &lt;- function(x) {   print(x^3) }\n\n\n\n\nThe issue with the function is that it uses print() instead of return(). To fix it, we should replace print(x^3) with return(x^3).\n\n\n\n\n\n\n Back to top",
+    "crumbs": [
+      "Open-Stat-Prog",
+      "User Defined Functions",
+      "Knowledge Quiz"
+    ]
+  },
+  {
+    "objectID": "conclusion.html",
+    "href": "conclusion.html",
+    "title": "Conclusion",
+    "section": "",
+    "text": "By completing this module, you’ve learned how to make your R code more efficient, expressive, and easier to read. You can now write your own functions to simplify repetitive tasks, use loops to automate operations, and connect multiple steps into smooth, logical pipelines with pipes. These tools are the foundation of programming in R, giving you the ability to build analyses that are not only powerful but also clear and reproducible.\n\n\n\n Back to top",
+    "crumbs": [
+      "Open-Stat-Prog",
+      "Conclusion"
+    ]
+  },
+  {
+    "objectID": "tutorials/pipes/diff_pipes.html",
+    "href": "tutorials/pipes/diff_pipes.html",
+    "title": "Different Pipe Operators in R",
+    "section": "",
+    "text": "The Exposition Pipe %$%\nThe exposition pipe (%$%), also from the magrittr package, behaves slightly differently. Instead of passing a dataset as an argument, it exposes the variable names of a data frame directly to the next function.\nFor example, we can write:\n\nbfi %$% lm(extra ~ age)\n\n\nCall:\nlm(formula = extra ~ age)\n\nCoefficients:\n(Intercept)          age  \n    3.97269      0.00599  \n\n\nThis works because %$% allows the variables extra and age to be used as if they were objects in the global environment, even though they come from within bfi. In practice this means that what we just did is equivalent to:\n\nlm(bfi$extra ~ bfi$age)\n\n\nCall:\nlm(formula = bfi$extra ~ bfi$age)\n\nCoefficients:\n(Intercept)      bfi$age  \n    3.97269      0.00599  \n\n\n\n\nThe Base R Pipe |&gt;\nAs of R 4.1, there’s also a native pipe operator: |&gt;. It works like %&gt;% but is simpler and doesn’t require loading dplyr or magrittr.\nYou can re-create the first example using only base R syntax:\n\nbfi[c(\"agree\", \"consc\", \"extra\", \"neuro\", \"open\")] |&gt;\n  cov(use = \"pairwise\") |&gt;\n  diag() |&gt;\n  sqrt()\n\n    agree     consc     extra     neuro      open \n0.8984019 0.9513469 1.0609041 1.1963314 0.8083739 \n\n\nThe base pipe is great for lightweight pipelines, while the %&gt;% pipe remains preferred for more complex workflows, especially those using tidyverse functions like mutate(), filter(), and select().\n\nPlease enable JavaScript to experience the dynamic code cell content on this page.\n\n\n\n\n\n\nPractice\n\n\n\nUse the pipe and exposition pipe to calculate the correlation between age and agree for adults in the bfi data.\n\n Interactive Editor Hint Solution\n\n\n\nPlease enable JavaScript to experience the dynamic code cell content on this page.\n\n\nYou can use the cor() function to compute the correlation between two variables.\n\n\n\nbfi %&gt;%\n  filter(age &gt;= 18) %$%\n  cor(age, agree)\n\n[1] 0.1546906\n\n\n\n\n\n\n\n\n\n\n\n Back to top",
+    "crumbs": [
+      "Open-Stat-Prog",
+      "Pipes",
+      "Different Pipe Operators in R"
+    ]
+  },
+  {
+    "objectID": "tutorials/pipes/index.html",
+    "href": "tutorials/pipes/index.html",
+    "title": "Pipes",
+    "section": "",
+    "text": "When data workflows grow beyond one or two steps, code quickly becomes hard to read: nested parentheses pile up, temporary objects proliferate, and the sequence of operations gets obscured. Pipes solve this by letting you write transformations in the order you think about them—left to right, top to bottom—so each result flows naturally into the next step.\nThe pipe operator, written as %&gt;%, is provided by the magrittr package . It works by taking the output of one expression and feeding it as the first argument to the next function. This simple idea makes your code easier to read, debug, and modify, especially for multi-step analyses.\n\n\n\n Back to top",
+    "crumbs": [
+      "Open-Stat-Prog",
+      "Pipes"
+    ]
+  },
+  {
+    "objectID": "tutorials/loop/vectorization.html",
+    "href": "tutorials/loop/vectorization.html",
+    "title": "Loops and Vectorization",
+    "section": "",
+    "text": "Loops are a flexible and intuitive way to express repetition, but in R they are not always the most efficient choice. The language is built around vectorized operations, which perform many computations in parallel under the hood. Instead of iterating over each element one at a time, R’s vectorized functions apply the same operation to entire vectors or matrices at once, using optimized internal code written in C.\nVectorized code is usually both faster and clearer, because it avoids explicit looping and intermediate assignments. It also makes your code more expressive — the operation you want to perform is stated directly, rather than described step by step.\nFor example, compare these two approaches:\n\nx &lt;- 1:5\n\n# Using a loop\nout &lt;- numeric(length(x))\nfor (i in seq_along(x)) {\n  out[i] &lt;- x[i]^2\n}\nout\n\n[1]  1  4  9 16 25\n\n# Vectorized version\nx^2\n\n[1]  1  4  9 16 25\n\n\nBoth produce the same result, but the vectorized expression x^2 is shorter, easier to read, and runs more efficiently.\nVectorization becomes even more powerful when working with data frames or matrices. Suppose we want to compute the mean of each column in a data frame:\n\ndf &lt;- data.frame(a = 1:5, b = 6:10, c = 11:15)\n\n# Loop version\nmeans &lt;- numeric(ncol(df))\nfor (i in seq_along(df)) {\n  means[i] &lt;- mean(df[[i]])\n}\nmeans\n\n[1]  3  8 13\n\n# Vectorized version using apply()\napply(df, 2, mean)\n\n a  b  c \n 3  8 13 \n\n\nThe apply() function internally handles the iteration over columns, making the code concise and efficient.\nIn general, vectorized functions like apply(), rowMeans(), sum(), mean(), or arithmetic operators are implemented in optimized C code. They avoid the overhead of R-level looping, which can be significant when working with large datasets.\nThat said, loops remain valuable when each iteration depends on the result of the previous one or when operations cannot be expressed as simple element-wise transformations. The key is to use loops when you need flexibility, and vectorized functions when you need speed and clarity.\n\n\n\n\n\n\nPractice\n\n\n\nVectorize the following loop that computes a quadratic transformation on a vector x:\n\nx &lt;- 1:10\nout &lt;- numeric(length(x))\n\nfor (i in seq_along(x)) {\n  out[i] &lt;- x[i]^2 + 3 * x[i] + 1\n}\n\nout\n\n [1]   5  11  19  29  41  55  71  89 109 131\n\n\n\n Interactive Editor Solution\n\n\n\nPlease enable JavaScript to experience the dynamic code cell content on this page.\n\n\n\nx &lt;- 1:10\nout &lt;- x^2 + 3 * x + 1\nout\n\n [1]   5  11  19  29  41  55  71  89 109 131\n\n\n\n\n\n\n\n\n\n\n Back to top",
+    "crumbs": [
+      "Open-Stat-Prog",
+      "Loops",
+      "Loops and Vectorization"
+    ]
+  },
+  {
+    "objectID": "tutorials/loop/conditional.html",
+    "href": "tutorials/loop/conditional.html",
+    "title": "Conditional Loops",
+    "section": "",
+    "text": "Not all loops in R have a fixed number of repetitions. Sometimes you want your code to keep running until a certain condition is met. In these cases, you can use conditional loops, which rely on logical tests rather than predefined sequences. R provides two main forms of conditional looping: the while loop and the repeat loop.\nA while loop checks a condition before each iteration and keeps running as long as that condition is TRUE. For example, the following loop prints numbers from 1 to 5:\n\nx &lt;- 1\nwhile (x &lt;= 5) {\n  print(x)\n  x &lt;- x + 1\n}\n\n[1] 1\n[1] 2\n[1] 3\n[1] 4\n[1] 5\n\n\nHere, the variable x starts at 1. Before every iteration, R checks whether x &lt;= 5. If the condition is true, the code inside the braces runs. Once the condition becomes false, the loop stops automatically.\nA repeat loop, on the other hand, does not check a condition at the start—it runs indefinitely until you explicitly tell it to stop using break().\n\nx &lt;- 1\nrepeat {\n  print(x)\n  x &lt;- x + 1\n  if (x &gt; 5) break\n}\n\n[1] 1\n[1] 2\n[1] 3\n[1] 4\n[1] 5\n\n\nThis produces the same output as the previous example. The repeat loop is useful when the stopping condition depends on a computation that happens inside the loop, rather than something known in advance.\nYou can also control the flow inside loops using two special commands: break and next. break, as we saw, immediately stops the loop, even if the condition is still true, while next skips the rest of the current iteration and moves on to the next one.\nHere’s a simple demonstration:\n\nfor (i in 1:5) {\n  if (i == 3) next     # skip 3\n  if (i == 5) break    # stop before printing 5\n  print(i)\n}\n\n[1] 1\n[1] 2\n[1] 4\n\n\nThis prints 1, 2, and 4 — it skips 3 because of next, and stops entirely before reaching 5 because of break.\nConditional loops and flow control give you flexibility: you can make loops respond to data dynamically, handle exceptions, or stop automatically when a specific goal is reached.\n\n\n\n\n\n\nPractice\n\n\n\nWrite a conditional loop that print all the possible combination between the numbers 1 to 10 in where the first number is bigger than the second number\n\n Interactive Editor Solution\n\n\n\nPlease enable JavaScript to experience the dynamic code cell content on this page.\n\n\n\ni &lt;- 1\nwhile(i &lt;= 10){\n  j &lt;- 1\n  while(j &lt;= 10){\n    if(i &lt; j) break\n    print(paste(i, j))\n    j &lt;- j + 1\n  }\n  i &lt;- i + 1\n}\n\n[1] \"1 1\"\n[1] \"2 1\"\n[1] \"2 2\"\n[1] \"3 1\"\n[1] \"3 2\"\n[1] \"3 3\"\n[1] \"4 1\"\n[1] \"4 2\"\n[1] \"4 3\"\n[1] \"4 4\"\n[1] \"5 1\"\n[1] \"5 2\"\n[1] \"5 3\"\n[1] \"5 4\"\n[1] \"5 5\"\n[1] \"6 1\"\n[1] \"6 2\"\n[1] \"6 3\"\n[1] \"6 4\"\n[1] \"6 5\"\n[1] \"6 6\"\n[1] \"7 1\"\n[1] \"7 2\"\n[1] \"7 3\"\n[1] \"7 4\"\n[1] \"7 5\"\n[1] \"7 6\"\n[1] \"7 7\"\n[1] \"8 1\"\n[1] \"8 2\"\n[1] \"8 3\"\n[1] \"8 4\"\n[1] \"8 5\"\n[1] \"8 6\"\n[1] \"8 7\"\n[1] \"8 8\"\n[1] \"9 1\"\n[1] \"9 2\"\n[1] \"9 3\"\n[1] \"9 4\"\n[1] \"9 5\"\n[1] \"9 6\"\n[1] \"9 7\"\n[1] \"9 8\"\n[1] \"9 9\"\n[1] \"10 1\"\n[1] \"10 2\"\n[1] \"10 3\"\n[1] \"10 4\"\n[1] \"10 5\"\n[1] \"10 6\"\n[1] \"10 7\"\n[1] \"10 8\"\n[1] \"10 9\"\n[1] \"10 10\"\n\n\n\n\n\n\n\n\n\n\n Back to top",
+    "crumbs": [
+      "Open-Stat-Prog",
+      "Loops",
+      "Conditional Loops"
+    ]
+  },
+  {
+    "objectID": "tutorials/user_fun/write_fun.html",
+    "href": "tutorials/user_fun/write_fun.html",
+    "title": "Writing Functions in R",
+    "section": "",
+    "text": "Functions are one of the most important tools in R. They let you package a sequence of operations into a single reusable command, reducing repetition and making your code easier to read and maintain.\nThe general structure of a function in R is as follows:\n\nfunction_name &lt;- function(arg1, arg2 = default_value) {\n  # body: operations using the arguments\n  return(output)\n}\n\nA function definition has three main components:\n\nName: the label you assign to your new function.\nArguments: the inputs your function takes; they can have default values.\nBody: the code that executes when the function is called.\n\nThe return() statement specifies what the function should output, but it is optional. If omitted, R automatically returns the value of the last evaluated expression.\nA simple example:\n\nsquare &lt;- function(x) {\n  x^2\n}\n\nsquare(4)\n\n[1] 16\n\n\nThis function takes one argument (x), squares it, and returns the result. You can store the output or use it directly in a calculation:\n\nsquare(3) + 2\n\n[1] 11\n\n\nIn R, functions are objects just like numbers, vectors, or data frames. You can print them, assign them, or inspect their content:\n\nsquare\n\nfunction (x) \n{\n    x^2\n}\n&lt;bytecode: 0x62116769b748&gt;\n\n\nThe main reason to write your own functions is to avoid repeating the same code. If you notice yourself copying and pasting the same few lines several times, that’s a good sign that those lines should become a function instead.\nFunctions help you to make the code more reusable, using one definition that can be called multiple times, to make the code more readable, using meaningful names to describe what the code does, and to encapsulate complexity, allowing you to hide the details of a process behind a simple interface.\nFor instance, suppose you frequently rescale numeric variables to a 0–1 range. Instead of repeating the logic each time, you can define a function once and call it whenever needed:\n\nrescale &lt;- function(x, na.rm = TRUE) {\n  rng &lt;- range(x, na.rm = na.rm)\n  (x - rng[1]) / (rng[2] - rng[1])\n}\nrescale(c(1, 5, 10))\n\n[1] 0.0000000 0.4444444 1.0000000\n\n\nThis function now performs a well-defined transformation in a single, descriptive call.\n\n\n\n\n\n\nPractice\n\n\n\nWrite a function that takes a temperature in Fahrenheit as input and returns the equivalent temperature in Celsius. The formula to convert Fahrenheit to Celsius is: C = (F - 32) * 5/9\n\n Interactive Editor Solution\n\n\n\nPlease enable JavaScript to experience the dynamic code cell content on this page.\n\n\n\nfahrenheit_to_celsius &lt;- function(f) {\n  (f - 32) * 5 / 9\n}\n\n\n\n\n\n\n\n\n\n Back to top",
+    "crumbs": [
+      "Open-Stat-Prog",
+      "User Defined Functions",
+      "Writing Functions in R"
+    ]
+  },
+  {
+    "objectID": "tutorials/user_fun/index.html",
+    "href": "tutorials/user_fun/index.html",
+    "title": "User defined Functions",
+    "section": "",
+    "text": "In R, functions are the fundamental building blocks of the language. Every command you call—whether it’s mean(), summary(), or mutate()—is a function. Learning to define your own functions allows you to capture repeated operations, reduce code duplication, and give structure to your analyses.\nWhen your analysis grows, you will often find yourself performing the same calculation or transformation on different datasets or variables. Instead of rewriting the same code each time, you can wrap that logic inside a function. This not only makes your code shorter and clearer, but also easier to debug, reuse, and share.\n\n\n\n Back to top",
+    "crumbs": [
+      "Open-Stat-Prog",
+      "User Defined Functions"
+    ]
+  }
+]
